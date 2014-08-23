@@ -16,6 +16,10 @@ import java.util.Map;
  */
 public class DbTest extends AndroidTestCase {
 
+    static final String TEST_CITY = "North Pole";
+    static final String TEST_LOCATION = "99705";
+    static final String TEST_DATE = "20141205";
+
     public void testCreate() throws Throwable {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
         SQLiteDatabase db = new WeatherDbHelper(mContext).getWritableDatabase();
@@ -57,8 +61,8 @@ public class DbTest extends AndroidTestCase {
 
     static ContentValues createLocationValues() {
         ContentValues values = new ContentValues();
-        values.put(LocationEntry.COLUMN_CITY_NAME, "North Pole");
-        values.put(LocationEntry.COLUMN_LOCATION_SETTING, 99705);
+        values.put(LocationEntry.COLUMN_CITY_NAME, TEST_CITY);
+        values.put(LocationEntry.COLUMN_LOCATION_SETTING, TEST_LOCATION);
         values.put(LocationEntry.COLUMN_LATITUDE, 64.7488);
         values.put(LocationEntry.COLUMN_LONGITUDE, -147.353);
         return values;
@@ -67,7 +71,7 @@ public class DbTest extends AndroidTestCase {
     static ContentValues createWeatherValues(long rowId) {
         ContentValues weatherValues = new ContentValues();
         weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, rowId);
-        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, "20141205");
+        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, TEST_DATE);
         weatherValues.put(WeatherEntry.COLUMN_DEGREES, 1.1);
         weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, 1.2);
         weatherValues.put(WeatherEntry.COLUMN_PRESSURE, 1.3);

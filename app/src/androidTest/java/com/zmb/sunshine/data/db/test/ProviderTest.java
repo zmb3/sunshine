@@ -12,7 +12,7 @@ import com.zmb.sunshine.data.db.WeatherDbHelper;
 import java.util.Map;
 
 /**
- * Unit tests for the weather database.
+ * Unit tests for the weather content provider.
  */
 public class ProviderTest extends AndroidTestCase {
 
@@ -26,17 +26,15 @@ public class ProviderTest extends AndroidTestCase {
         // vnd.android.cursor.dir/com.zmb.sunshine/weather
         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
-        String testLocation = "94074";
         // content://com.zmb.sunshine/weather/94074
         type = mContext.getContentResolver().getType(
-                WeatherEntry.buildWeatherLocation(testLocation));
+                WeatherEntry.buildWeatherLocation(DbTest.TEST_LOCATION));
         // vnd.android.cursor.dir/com.zmb.sunshine/weather
         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
-        String testDate = "20140612";
         // content://com.zmb.sunshine/weather/94074/20140612
         type = mContext.getContentResolver().getType(
-                WeatherEntry.buildWeatherLocationWithStartDate(testLocation, testDate));
+                WeatherEntry.buildWeatherLocationWithDate(DbTest.TEST_LOCATION, DbTest.TEST_DATE));
         // vnd.android.cursor.item/com.zmb.sunshine/weather
         assertEquals(WeatherEntry.CONTENT_ITEM_TYPE, type);
 
@@ -55,12 +53,12 @@ public class ProviderTest extends AndroidTestCase {
         WeatherDbHelper helper = new WeatherDbHelper(mContext);
         SQLiteDatabase db = helper.getWritableDatabase();
 
-        ContentValues locationValues = createLocationValues();
+        ContentValues locationValues = DbTest.createLocationValues();
         long locationRowId = db.insert(LocationEntry.TABLE_NAME, null, locationValues);
         assertTrue(locationRowId != -1);
 
         // this looks just like the test in TestDb but instead of querying the database
-        // directly we use a content resovler to query the content provider
+        // directly we use a content resolver to query the content provider
         validateCursor(mContext.getContentResolver().query(
                 LocationEntry.CONTENT_URI, null, null, null, null), locationValues);
 
@@ -69,11 +67,25 @@ public class ProviderTest extends AndroidTestCase {
                 LocationEntry.buildLocationUri(locationRowId),
                 null, null, null, null)), locationValues);
 
-        ContentValues weatherValues = createWeatherValues(locationRowId);
+        ContentValues weatherValues = DbTest.createWeatherValues(locationRowId);
         long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
         assertTrue(weatherRowId != -1);
         validateCursor(mContext.getContentResolver().query(
                 WeatherEntry.CONTENT_URI, null, null, null, null), weatherValues);
+
+        // test the JOIN
+        addAllContentValues(weatherValues, locationValues);
+        validateCursor(mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocation(DbTest.TEST_LOCATION),
+                null, null, null, null), weatherValues);
+
+        validateCursor(mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocationWithStartDate(DbTest.TEST_LOCATION, DbTest.TEST_DATE),
+                null, null, null, null), weatherValues);
+
+        validateCursor(mContext.getContentResolver().query(
+                WeatherEntry.buildWeatherLocationWithDate(DbTest.TEST_LOCATION, DbTest.TEST_DATE),
+                null, null, null, null), weatherValues);
 
         helper.close();
     }
@@ -91,27 +103,9 @@ public class ProviderTest extends AndroidTestCase {
         cursor.close();
     }
 
-    static ContentValues createLocationValues() {
-        ContentValues values = new ContentValues();
-        values.put(LocationEntry.COLUMN_CITY_NAME, "North Pole");
-        values.put(LocationEntry.COLUMN_LOCATION_SETTING, 99705);
-        values.put(LocationEntry.COLUMN_LATITUDE, 64.7488);
-        values.put(LocationEntry.COLUMN_LONGITUDE, -147.353);
-        return values;
-    }
-
-    static ContentValues createWeatherValues(long rowId) {
-        ContentValues weatherValues = new ContentValues();
-        weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, rowId);
-        weatherValues.put(WeatherEntry.COLUMN_DATETEXT, "20141205");
-        weatherValues.put(WeatherEntry.COLUMN_DEGREES, 1.1);
-        weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, 1.2);
-        weatherValues.put(WeatherEntry.COLUMN_PRESSURE, 1.3);
-        weatherValues.put(WeatherEntry.COLUMN_TEMPERATURE_HIGH, 75);
-        weatherValues.put(WeatherEntry.COLUMN_TEMPERATURE_LOW, 65);
-        weatherValues.put(WeatherEntry.COLUMN_SHORT_DESCRIPTION, "Asteroids");
-        weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, 5.5);
-        weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, 321);
-        return weatherValues;
+    static void addAllContentValues(ContentValues destination, ContentValues source) {
+        for (String key : source.keySet()) {
+            destination.put(key, source.getAsString(key));
+        }
     }
 }
