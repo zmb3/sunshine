@@ -1,8 +1,9 @@
 package com.zmb.sunshine.data.db.test;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import com.zmb.sunshine.data.db.WeatherContract.LocationEntry;
@@ -50,12 +51,11 @@ public class ProviderTest extends AndroidTestCase {
     }
 
     public void testInsertReadProvider() {
-        WeatherDbHelper helper = new WeatherDbHelper(mContext);
-        SQLiteDatabase db = helper.getWritableDatabase();
-
         ContentValues locationValues = DbTest.createLocationValues();
-        long locationRowId = db.insert(LocationEntry.TABLE_NAME, null, locationValues);
-        assertTrue(locationRowId != -1);
+        // instead of inserting directly into the database, use the provider instead
+        Uri insert = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
+        long locationRowId = ContentUris.parseId(insert);
+        assertNotNull(insert);
 
         // this looks just like the test in TestDb but instead of querying the database
         // directly we use a content resolver to query the content provider
@@ -68,8 +68,8 @@ public class ProviderTest extends AndroidTestCase {
                 null, null, null, null)), locationValues);
 
         ContentValues weatherValues = DbTest.createWeatherValues(locationRowId);
-        long weatherRowId = db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
-        assertTrue(weatherRowId != -1);
+        insert = mContext.getContentResolver().insert(WeatherEntry.CONTENT_URI, weatherValues);
+        assertNotNull(insert);
         validateCursor(mContext.getContentResolver().query(
                 WeatherEntry.CONTENT_URI, null, null, null, null), weatherValues);
 
@@ -86,8 +86,6 @@ public class ProviderTest extends AndroidTestCase {
         validateCursor(mContext.getContentResolver().query(
                 WeatherEntry.buildWeatherLocationWithDate(DbTest.TEST_LOCATION, DbTest.TEST_DATE),
                 null, null, null, null), weatherValues);
-
-        helper.close();
     }
 
     static void validateCursor(Cursor cursor, ContentValues values) {

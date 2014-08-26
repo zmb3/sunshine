@@ -5,6 +5,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
@@ -30,7 +31,6 @@ public class WeatherProvider extends ContentProvider {
     private static final String sLocationSelectionWithExactDate;
 
     private WeatherDbHelper mOpenHelper;
-
 
     static {
         sQueryBuilder.setTables(WeatherContract.WeatherEntry.TABLE_NAME + " INNER JOIN " +
@@ -113,16 +113,48 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues contentValues) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Uri result;
+        try {
+            // we only allow insertions at the root URI to make it easy
+            // to handle notifications when new data is inserted
+            switch (match) {
+                case WEATHER:
+                    long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, contentValues);
+                    if (id != -1) {
+                       result = WeatherContract.WeatherEntry.buildWeatherUri(id);
+                    } else {
+                        throw new android.database.SQLException("Failed to insert row into " + uri);
+                    }
+                    break;
+                case LOCATION:
+                    id = db.insert(WeatherContract.LocationEntry.TABLE_NAME, null, contentValues);
+                    if (id != -1) {
+                        result = WeatherContract.LocationEntry.buildLocationUri(id);
+                    } else {
+                        throw new android.database.SQLException("Failed to insert row into " + uri);
+                    }
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown URI: " + uri);
+            }
+
+            // notify any registered observers that the data changed
+            getContext().getContentResolver().notifyChange(result, null);
+        } finally {
+            db.close();
+        }
+        return result;
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
+    public int delete(Uri uri, String selection, String[] selectionArgs) {
         return 0;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         return 0;
     }
 
