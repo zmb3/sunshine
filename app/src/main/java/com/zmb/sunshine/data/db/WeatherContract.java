@@ -4,6 +4,9 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Contains database and column names used for storing ewather data.
  */
@@ -19,6 +22,18 @@ public class WeatherContract {
     // paths that we append to the base URI
     public static final String PATH_WEATHER = "weather";
     public static final String PATH_LOCATION = "location";
+
+    private static final SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyyMMdd");
+
+    /**
+     * Convert a {@link java.util.Date} into a string that's compatible
+     * with the way we store dates (yyyyMMdd).
+     * @param date the date to convert
+     * @return the date expressed as a string
+     */
+    public static String convertDateToString(Date date) {
+        return sDateFormat.format(date);
+    }
 
     /**
      * Defines the contents of the weather table.

@@ -1,5 +1,7 @@
 package com.zmb.sunshine.data.openweathermap;
 
+import android.net.Uri;
+
 import com.zmb.sunshine.data.DayForecast;
 import com.zmb.sunshine.data.DayOfWeek;
 import com.zmb.sunshine.data.IWeatherDataParser;
@@ -9,26 +11,50 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
- * Parses weather data received from Ope Weather ma.
+ * Parses weather data received from Ope Weather map.
  */
 public class OpenWeatherMapParser implements IWeatherDataParser {
 
+    private static final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily";
+
     @Override
-    public List<DayForecast> parse(String data, int numberOfDays) throws WeatherParseException {
+    public URL buildUrl(String locationSetting, int daysToFetch) throws MalformedURLException {
+        // we have to add ",USA" to the location setting or open weather map
+        // gets confused and looks outside the USA
+        locationSetting += ",USA";
+
+        Uri uri = Uri.parse(BASE_URL).buildUpon()
+                .appendQueryParameter("q", locationSetting)
+                .appendQueryParameter("mode", "json")
+                .appendQueryParameter("units", "metric")
+                .appendQueryParameter("cnt", String.valueOf(daysToFetch))
+                .build();
+        URL url = new URL(uri.toString());
+        return url;
+    }
+
+    @Override
+    public Result parse(String data, int numberOfDays) throws WeatherParseException {
         try {
-            List<DayForecast> forecasts = new ArrayList<DayForecast>();
             JSONObject json = new JSONObject(data);
+            JSONObject city = json.getJSONObject("city");
+            String cityName = city.getString("name");
+            JSONObject location = json.getJSONObject("coord");
+            double lat = location.getDouble("lat");
+            double lon = location.getDouble("lon");
+
+            Result result = new Result(cityName, lat, lon);
             JSONArray days = json.getJSONArray("list");
             for (int i = 0; i < numberOfDays; ++i) {
-                forecasts.add(parseDay(days.getJSONObject(i)));
+                result.addForecast(parseDay(days.getJSONObject(i)));
             }
-            return forecasts;
+            return result;
         } catch (JSONException e) {
             throw new WeatherParseException(data, e);
         }
@@ -48,7 +74,7 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
         c.setTime(date);
         int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
 
-        return new DayForecast(max, min, getDayOfWeek(dayOfWeek), desc);
+        return new DayForecast(max, min, getDayOfWeek(dayOfWeek), desc, date);
     }
 
     /**

@@ -150,12 +150,81 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        final int match = sUriMatcher.match(uri);
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int deleted;
+        try {
+            switch (match) {
+                case WEATHER:
+                    deleted = db.delete(WeatherContract.WeatherEntry.TABLE_NAME, selection, selectionArgs);
+                    break;
+                case LOCATION:
+                    deleted = db.delete(WeatherContract.LocationEntry.TABLE_NAME, selection, selectionArgs);
+                    break;
+                default:
+                    deleted = 0;
+                    break;
+            }
+        } finally {
+            db.close();
+        }
+        // null selection deletes all rows
+        if (selection == null || deleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return deleted;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        final int match = sUriMatcher.match(uri);
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int updated;
+        try {
+            switch (match) {
+                case WEATHER:
+                    updated = db.update(WeatherContract.WeatherEntry.TABLE_NAME, values, selection, selectionArgs);
+                    break;
+                case LOCATION:
+                    updated = db.update(WeatherContract.LocationEntry.TABLE_NAME, values, selection, selectionArgs);
+                    break;
+                default:
+                    updated = 0;
+                    break;
+            }
+        } finally {
+            db.close();
+        }
+        if (updated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return updated;
+    }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        int match = sUriMatcher.match(uri);
+        switch (match)
+        {
+            case WEATHER:
+                db.beginTransaction();
+                int count = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
+                        if (id != -1) { ++count; }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    // commits the updates
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return count;
+            default:
+                return super.bulkInsert(uri, values);
+        }
     }
 
     private static UriMatcher buildUriMatcher() {

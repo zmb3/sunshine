@@ -8,7 +8,6 @@ import android.test.AndroidTestCase;
 
 import com.zmb.sunshine.data.db.WeatherContract.LocationEntry;
 import com.zmb.sunshine.data.db.WeatherContract.WeatherEntry;
-import com.zmb.sunshine.data.db.WeatherDbHelper;
 
 import java.util.Map;
 
@@ -17,8 +16,24 @@ import java.util.Map;
  */
 public class ProviderTest extends AndroidTestCase {
 
-    public void testDeleteDb() throws Throwable {
-        mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        testDeleteAllRecords();
+    }
+
+    public void testDeleteAllRecords() {
+        // passing a null query deletes all records
+        mContext.getContentResolver().delete(WeatherEntry.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(LocationEntry.CONTENT_URI, null, null);
+
+        Cursor c = mContext.getContentResolver().query(WeatherEntry.CONTENT_URI, null, null, null, null);
+        assertEquals(c.getCount(), 0);
+        c.close();
+
+        c = mContext.getContentResolver().query(LocationEntry.CONTENT_URI, null, null, null, null);
+        assertEquals(c.getCount(), 0);
+        c.close();
     }
 
     public void testGetType() {
@@ -86,6 +101,25 @@ public class ProviderTest extends AndroidTestCase {
         validateCursor(mContext.getContentResolver().query(
                 WeatherEntry.buildWeatherLocationWithDate(DbTest.TEST_LOCATION, DbTest.TEST_DATE),
                 null, null, null, null), weatherValues);
+    }
+
+    public void testUpdateLocation() {
+        ContentValues values = DbTest.createLocationValues();
+        Uri uri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, values);
+        long rowId = ContentUris.parseId(uri);
+
+        assertTrue(rowId != -1);
+
+        ContentValues newValues = new ContentValues(values);
+        newValues.put(LocationEntry._ID, rowId);
+        newValues.put(LocationEntry.COLUMN_CITY_NAME, "Santa's Village");
+
+        int count = mContext.getContentResolver().update(LocationEntry.CONTENT_URI, newValues,
+                LocationEntry._ID + "= ?", new String[] { Long.toString(rowId) });
+        assertEquals(count, 1);
+
+        validateCursor(mContext.getContentResolver().query(LocationEntry.buildLocationUri(rowId),
+                null, null, null, null), newValues);
     }
 
     static void validateCursor(Cursor cursor, ContentValues values) {

@@ -1,5 +1,7 @@
 package com.zmb.sunshine.data;
 
+import java.util.Date;
+
 /**
  * An object to represent a single day in the weekly forecast.
  * All units are metric.
@@ -10,12 +12,16 @@ public class DayForecast {
     private final double mLowTemperature;
     private final DayOfWeek mDay;
     private final String mDescription;
+    private final Date mDate;
 
-    public DayForecast(double high, double low, DayOfWeek day, String desc) {
+    // TODO: add humidity, pressure, wind speed, wind direction
+
+    public DayForecast(double high, double low, DayOfWeek day, String desc, Date date) {
         mHighTemperature = high;
         mLowTemperature = low;
         mDay = day;
         mDescription = desc;
+        mDate = date;
     }
 
     /**
@@ -36,6 +42,10 @@ public class DayForecast {
 
     public DayOfWeek getDay() {
         return mDay;
+    }
+
+    public Date getDate() {
+        return mDate;
     }
 
     public String getDescription() {
