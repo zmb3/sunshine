@@ -50,6 +50,7 @@ public interface IWeatherDataParser {
 
     public URL buildUrl(String locationSetting, int daysToFetch) throws MalformedURLException;
 
+    // TODO: we don't need to return any results - just insert into the database
     public Result parse(String data, int numberOfDays) throws WeatherParseException;
 
 }

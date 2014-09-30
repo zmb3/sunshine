@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -33,6 +34,14 @@ public class WeatherContract {
      */
     public static String convertDateToString(Date date) {
         return sDateFormat.format(date);
+    }
+
+    public static Date convertStringToDate(String date) {
+        try {
+            return sDateFormat.parse(date);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
     /**

@@ -46,10 +46,10 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
             WeatherEntry.COLUMN_WEATHER_ID + " INTEGER NOT NULL, " +             // TODO might change when we support other sources
             WeatherEntry.COLUMN_TEMPERATURE_HIGH + " REAL NOT NULL, " +
             WeatherEntry.COLUMN_TEMPERATURE_LOW + " REAL NOT NULL, " +
-            WeatherEntry.COLUMN_HUMIDITY + " REAL NOT NULL, " +
-            WeatherEntry.COLUMN_PRESSURE + " REAL NOT NULL, " +
-            WeatherEntry.COLUMN_WIND_SPEED + " REAL NOT NULL, " +
-            WeatherEntry.COLUMN_DEGREES + " REAL NOT NULL, " +
+            WeatherEntry.COLUMN_HUMIDITY + " REAL, " +
+            WeatherEntry.COLUMN_PRESSURE + " REAL, " +
+            WeatherEntry.COLUMN_WIND_SPEED + " REAL, " +
+            WeatherEntry.COLUMN_DEGREES + " REAL, " +
 
             // location column is foreign key into location table
             " FOREIGN KEY (" + WeatherEntry.COLUMN_LOC_KEY + ") REFERENCES " +

@@ -6,9 +6,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import com.zmb.sunshine.data.DayForecast;
@@ -31,33 +29,14 @@ class FetchWeatherTask extends AsyncTask<String, Void, List<DayForecast>> {
     private static final int DAYS_TO_FETCH = 14;
 
     private final Context mContext;
-    private final ArrayAdapter<String> mAdapter;
 
     // TODO: for now we're hard coded to use open weather map
     private final IWeatherDataParser mParser = new OpenWeatherMapParser();
 
-    public FetchWeatherTask(Context context, ArrayAdapter<String> adapter) {
+    public FetchWeatherTask(Context context) {
         mContext = context;
-        mAdapter = adapter;
     }
 
-    @Override
-    protected void onPostExecute(List<DayForecast> dayForecasts) {
-        if (dayForecasts != null) {
-            final String imperial = mContext.getString(R.string.pref_units_imperial);
-            final String units = PreferenceManager
-                    .getDefaultSharedPreferences(mContext)
-                    .getString(mContext.getString(R.string.pref_units_key), imperial);
-            mAdapter.clear();
-            for (DayForecast d : dayForecasts) {
-                if (units.equals(imperial)) {
-                    mAdapter.add(d.toStringImperial());
-                } else {
-                    mAdapter.add(d.toStringMetric());
-                }
-            }
-        }
-    }
 
     protected List<DayForecast> doInBackground(String... params) {
         if (params.length == 0) {
@@ -91,13 +70,23 @@ class FetchWeatherTask extends AsyncTask<String, Void, List<DayForecast>> {
                 values.put(WeatherContract.WeatherEntry.COLUMN_DATETEXT, WeatherContract.convertDateToString(day.getDate()));
                 values.put(WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH, day.getHighTemperature());
                 values.put(WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW, day.getLowTemperature());
+                values.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION, day.getDescription());
+
                 // TODO: add humidity, pressure, wind speed, wind direction, etc.
+                values.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, 1 /* TODO: weather ID ?> */);
+                values.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, 1);
+                values.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, 1.0);
+                values.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, 1.0);
+                values.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, 1.0);
+
                 itemsToInsert.add(values);
             }
             int rowsInserted = mContext.getContentResolver().bulkInsert(WeatherContract.WeatherEntry.CONTENT_URI,
                     itemsToInsert.toArray(new ContentValues[itemsToInsert.size()]));
             Log.d(TAG, "Inserted " + rowsInserted + " rows of weather data>");
 
+            // TODO: we don't need to return a result here because we use a loader that
+            // automatically updates when we insert into the database
             return result.getDays();
 
         } catch (IOException e) {

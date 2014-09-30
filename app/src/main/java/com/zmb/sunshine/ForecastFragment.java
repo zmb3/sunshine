@@ -1,10 +1,16 @@
 package com.zmb.sunshine;
 
 import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,21 +18,49 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.zmb.sunshine.data.Convert;
+import com.zmb.sunshine.data.db.WeatherContract;
+
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * A fragment for displaying the overall forecast for
  * several days of weather data.
  */
-public class ForecastFragment extends Fragment {
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String TAG = "ForecastFragment";
 
+    private static final int LOADER_ID = 0;
+
+    /**
+     * The database columns that we'll display in this fragment.
+     */
+    private static final String[] FORECAST_COLUMNS = {
+            WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
+            WeatherContract.WeatherEntry.COLUMN_DATETEXT,
+            WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION,
+            WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH,
+            WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW,
+            WeatherContract.WeatherEntry.COLUMN_LOC_KEY
+    };
+
+    // These indices are tied to the columns above.
+    public static final int COL_WEATHER_ID = 0;
+    public static final int COL_WEATHER_DATE = 1;
+    public static final int COL_WEATHER_DESC = 2;
+    public static final int COL_WEATHER_HIGH = 3;
+    public static final int COL_WEATHER_LOW = 4;
+    public static final int COL_WEATHER_LOCATION = 5;
+
     private ListView mForecastList;
-    private ArrayAdapter<String> mAdapter;
+    private SimpleCursorAdapter mAdapter;
+    private String mLocation;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,14 +70,49 @@ public class ForecastFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // loaders get initialized here instead of in onCreate
+        // because their lifecycles are bound to that of the
+        // activity, not the fragment.
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mAdapter = new ArrayAdapter<String>(
-                getActivity(),
-                R.layout.list_item_forecast,
-                R.id.list_item_forecast_textview,
-                new ArrayList<String>());
+        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_forecast, null,
+                new String[] { WeatherContract.WeatherEntry.COLUMN_DATETEXT,
+                        WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION,
+                        WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH,
+                        WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW},
+                new int[] { R.id.list_item_date_textview,
+                        R.id.list_item_forecast_textview,
+                        R.id.list_item_high_textview,
+                        R.id.list_item_low_textview}, 0);
+
+        // a view binder lets us format the data before it is displayed in the view
+        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int column) {
+                switch (column) {
+                    case COL_WEATHER_HIGH:
+                    case COL_WEATHER_LOW:
+                        double temperatureCelcius = cursor.getDouble(column);
+                        ((TextView)view).setText(formatTemperature(temperatureCelcius));
+                        return true;
+                    case COL_WEATHER_DATE:
+                        String date = cursor.getString(column);
+                        TextView dateView = (TextView) view;
+                        dateView.setText(DateFormat.getDateInstance().format(WeatherContract.convertStringToDate(date)));
+                        return true;
+                    default: return false;
+                }
+            }
+        });
 
         mForecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
         mForecastList.setAdapter(mAdapter);
@@ -53,9 +122,20 @@ public class ForecastFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 // navigate to the detail activity
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                String forecast = mAdapter.getItem(position);
-                intent.putExtra(Intent.EXTRA_TEXT, forecast);
-                startActivity(intent);
+                SimpleCursorAdapter adapter = (SimpleCursorAdapter) adapterView.getAdapter();
+                Cursor cursor = adapter.getCursor();
+                if (cursor != null && cursor.moveToPosition(position)) {
+                    String forecast = String.format("%s - %s - %s / %s",
+                            DateFormat.getDateInstance().format(WeatherContract.convertStringToDate(cursor.getString(COL_WEATHER_DATE))),
+                            cursor.getString(COL_WEATHER_DESC),
+                            formatTemperature(cursor.getDouble(COL_WEATHER_HIGH)),
+                            formatTemperature(cursor.getDouble(COL_WEATHER_LOW)));
+                    intent.putExtra(Intent.EXTRA_TEXT, forecast);
+                    startActivity(intent);
+                } else {
+                    Log.e(TAG, "Couldn't move cursor to position " + position + ", cursor is " + cursor);
+                }
+
             }
         });
         return rootView;
@@ -85,11 +165,47 @@ public class ForecastFragment extends Fragment {
     private void updateWeather() {
         // pull the zip code from the preferences
         // and use it to fetch weather data
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location = prefs.getString(
-                getString(R.string.pref_location_key),
-                getString(R.string.pref_location_default));
-        new FetchWeatherTask(getActivity(), mAdapter).execute(location);
+        mLocation = getPreferredLocation();
+        new FetchWeatherTask(getActivity()).execute(mLocation);
     }
 
+    private String getPreferredLocation() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        return prefs.getString(
+                getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+    }
+
+    private String formatTemperature(double temperature) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String units = prefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_imperial));
+        if (units.equals(getString(R.string.pref_units_imperial))) {
+            temperature = Convert.toFahrenheit(temperature);
+        }
+        return String.valueOf(temperature);
+    }
+
+    /**
+     * Called when a new Loader needs to be created.
+     * The loader is going to use our content provider to query the database.
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        // we only want to look for current and future days' forecasts
+        String today = WeatherContract.convertDateToString(new Date());
+        String orderAscending = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
+        mLocation = getPreferredLocation();
+        Uri uri = WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(mLocation, today);
+        return new CursorLoader(getActivity(), uri, FORECAST_COLUMNS, null, null, orderAscending);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mAdapter.swapCursor(null);
+    }
 }

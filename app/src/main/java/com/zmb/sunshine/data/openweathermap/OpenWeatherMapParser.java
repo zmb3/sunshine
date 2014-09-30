@@ -45,7 +45,7 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
             JSONObject json = new JSONObject(data);
             JSONObject city = json.getJSONObject("city");
             String cityName = city.getString("name");
-            JSONObject location = json.getJSONObject("coord");
+            JSONObject location = city.getJSONObject("coord");
             double lat = location.getDouble("lat");
             double lon = location.getDouble("lon");
 
