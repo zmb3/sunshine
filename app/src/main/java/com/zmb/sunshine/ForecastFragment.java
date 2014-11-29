@@ -22,10 +22,8 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
-import com.zmb.sunshine.data.Convert;
 import com.zmb.sunshine.data.db.WeatherContract;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 /**
@@ -101,13 +99,16 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 switch (column) {
                     case COL_WEATHER_HIGH:
                     case COL_WEATHER_LOW:
+                        // everything in the DB is metric, convert if necessary
                         double temperatureCelcius = cursor.getDouble(column);
-                        ((TextView)view).setText(formatTemperature(temperatureCelcius));
+                        TextView temperature = (TextView) view;
+                        temperature.setText(Sunshine.formatTemperature(temperatureCelcius,
+                                Sunshine.isMetric(getActivity())));
                         return true;
                     case COL_WEATHER_DATE:
                         String date = cursor.getString(column);
                         TextView dateView = (TextView) view;
-                        dateView.setText(DateFormat.getDateInstance().format(WeatherContract.convertStringToDate(date)));
+                        dateView.setText(Sunshine.formatDate(date));
                         return true;
                     default: return false;
                 }
@@ -125,12 +126,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 SimpleCursorAdapter adapter = (SimpleCursorAdapter) adapterView.getAdapter();
                 Cursor cursor = adapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    String forecast = String.format("%s - %s - %s / %s",
-                            DateFormat.getDateInstance().format(WeatherContract.convertStringToDate(cursor.getString(COL_WEATHER_DATE))),
-                            cursor.getString(COL_WEATHER_DESC),
-                            formatTemperature(cursor.getDouble(COL_WEATHER_HIGH)),
-                            formatTemperature(cursor.getDouble(COL_WEATHER_LOW)));
-                    intent.putExtra(Intent.EXTRA_TEXT, forecast);
+                    intent.putExtra(DetailActivity.DetailFragment.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
                     startActivity(intent);
                 } else {
                     Log.e(TAG, "Couldn't move cursor to position " + position + ", cursor is " + cursor);
@@ -144,7 +140,16 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onStart() {
         super.onStart();
-        updateWeather();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // fetch new weather data if the location has changed
+        if (mLocation != null && !getPreferredLocation().equals(mLocation)) {
+            getLoaderManager().restartLoader(LOADER_ID, null, this);
+        }
     }
 
     @Override
@@ -162,6 +167,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return super.onOptionsItemSelected(item);
     }
 
+
+
     private void updateWeather() {
         // pull the zip code from the preferences
         // and use it to fetch weather data
@@ -174,15 +181,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return prefs.getString(
                 getString(R.string.pref_location_key),
                 getString(R.string.pref_location_default));
-    }
-
-    private String formatTemperature(double temperature) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String units = prefs.getString(getString(R.string.pref_units_key), getString(R.string.pref_units_imperial));
-        if (units.equals(getString(R.string.pref_units_imperial))) {
-            temperature = Convert.toFahrenheit(temperature);
-        }
-        return String.valueOf(temperature);
     }
 
     /**
