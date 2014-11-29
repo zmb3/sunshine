@@ -1,6 +1,5 @@
 package com.zmb.sunshine;
 
-
 import android.content.Context;
 import android.preference.PreferenceManager;
 

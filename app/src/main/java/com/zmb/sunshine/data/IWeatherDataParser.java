@@ -1,9 +1,9 @@
 package com.zmb.sunshine.data;
 
+import android.content.Context;
+
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Parses weather data returned by a web service.
@@ -11,46 +11,24 @@ import java.util.List;
 public interface IWeatherDataParser {
 
     /**
-     * Stores deserialized weather data, after parsing.
+     * Builds the URL to query for weather data.
+     *
+     * @param locationSetting the location to query for data
+     * @param daysToFetch the number of days of data to query for
+     * @return the URL to query
+     * @throws MalformedURLException
      */
-    public static class Result {
-
-        private final List<DayForecast> days = new ArrayList<DayForecast>();
-        private final String mCityName;
-        private final double mLatitude;
-        private final double mLongitude;
-
-        public Result(String city, double lat, double lon) {
-            this.mCityName = city;
-            this.mLatitude = lat;
-            this.mLongitude = lon;
-        }
-
-        public void addForecast(DayForecast day) {
-            this.days.add(day);
-        }
-
-        public List<DayForecast> getDays() {
-            return days;
-        }
-
-        public String getCityName() {
-            return mCityName;
-        }
-
-        public double getLongitude() {
-            return mLongitude;
-        }
-
-        public double getLatitude() {
-            return mLatitude;
-        }
-
-    }
-
     public URL buildUrl(String locationSetting, int daysToFetch) throws MalformedURLException;
 
-    // TODO: we don't need to return any results - just insert into the database
-    public Result parse(String data, int numberOfDays) throws WeatherParseException;
+    /**
+     * This method is responsible for parsing the API response
+     * and inserting the resulting data into the database.
+     *
+     * @param c
+     * @param data the API response
+     * @param numberOfDays the number of days worth of data to parse
+     * @throws WeatherParseException if an error occurs
+     */
+    public void parse(Context c, String data, int numberOfDays) throws WeatherParseException;
 
 }
