@@ -33,12 +33,15 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
 
     @Override
     public URL buildUrl(String locationSetting, int daysToFetch) throws MalformedURLException {
+
+        mLocation = locationSetting;
+
         // we have to add ",USA" to the location setting or open weather map
         // gets confused and looks outside the USA
-        mLocation = locationSetting + ",USA";
+        locationSetting += ",USA";
 
         Uri uri = Uri.parse(BASE_URL).buildUpon()
-                .appendQueryParameter("q", mLocation)
+                .appendQueryParameter("q", locationSetting)
                 .appendQueryParameter("mode", "json")
                 .appendQueryParameter("units", "metric")
                 .appendQueryParameter("cnt", String.valueOf(daysToFetch))
@@ -86,14 +89,15 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
         ContentResolver cr = c.getContentResolver();
         Cursor cursor = cr.query(
                 WeatherContract.LocationEntry.CONTENT_URI,
-                new String[]{WeatherContract.LocationEntry._ID},
+                new String[] { WeatherContract.LocationEntry._ID },
                 WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ?",
-                new String[]{locationSetting},
+                new String[] { locationSetting },
                 null);
         try {
             if (cursor.moveToFirst()) {
                 // the location was already in the database
-                return cursor.getLong(cursor.getColumnIndex(WeatherContract.LocationEntry._ID));
+                int locationId = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+                return cursor.getLong(locationId);
             } else {
                 // location wasn't in database, must be added
                 ContentValues values = new ContentValues();
@@ -103,7 +107,6 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
                 values.put(WeatherContract.LocationEntry.COLUMN_LONGITUDE,lon);
                 Uri uri = cr.insert(WeatherContract.LocationEntry.CONTENT_URI, values);
                 return ContentUris.parseId(uri);
-
             }
         } finally {
             cursor.close();

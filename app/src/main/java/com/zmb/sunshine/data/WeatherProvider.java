@@ -41,12 +41,14 @@ public class WeatherProvider extends ContentProvider {
         // '?' character will be replaced by query parameters
         sLocationSelection = WeatherContract.LocationEntry.TABLE_NAME +
                 "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? ";
+
         sLocationSelectionWithStartDate = WeatherContract.LocationEntry.TABLE_NAME +
                 "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
                 WeatherContract.WeatherEntry.COLUMN_DATETEXT + " >= ? ";
+
         sLocationSelectionWithExactDate = WeatherContract.LocationEntry.TABLE_NAME +
                 "." + WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-                WeatherContract.WeatherEntry.COLUMN_DATETEXT + " == ? ";
+                WeatherContract.WeatherEntry.COLUMN_DATETEXT + " = ? ";
     }
 
     @Override
@@ -141,7 +143,7 @@ public class WeatherProvider extends ContentProvider {
             }
 
             // notify any registered observers that the data changed
-            getContext().getContentResolver().notifyChange(result, null);
+            getContext().getContentResolver().notifyChange(uri, null);
         } finally {
             db.close();
         }
@@ -192,11 +194,11 @@ public class WeatherProvider extends ContentProvider {
                     updated = 0;
                     break;
             }
+            if (updated != 0) {
+                getContext().getContentResolver().notifyChange(uri, null);
+            }
         } finally {
             db.close();
-        }
-        if (updated != 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
         }
         return updated;
     }
@@ -204,26 +206,30 @@ public class WeatherProvider extends ContentProvider {
     @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        int match = sUriMatcher.match(uri);
-        switch (match)
-        {
-            case WEATHER:
-                db.beginTransaction();
-                int count = 0;
-                try {
-                    for (ContentValues value : values) {
-                        long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
-                        if (id != -1) { ++count; }
+        try {
+            int match = sUriMatcher.match(uri);
+            switch (match)
+            {
+                case WEATHER:
+                    db.beginTransaction();
+                    int count = 0;
+                    try {
+                        for (ContentValues value : values) {
+                            long id = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, value);
+                            if (id != -1) { ++count; }
+                        }
+                        db.setTransactionSuccessful();
+                    } finally {
+                        // commits the updates
+                        db.endTransaction();
                     }
-                    db.setTransactionSuccessful();
-                } finally {
-                    // commits the updates
-                    db.endTransaction();
-                }
-                getContext().getContentResolver().notifyChange(uri, null);
-                return count;
-            default:
-                return super.bulkInsert(uri, values);
+                    getContext().getContentResolver().notifyChange(uri, null);
+                    return count;
+                default:
+                    return super.bulkInsert(uri, values);
+            }
+        } finally {
+            db.close();
         }
     }
 

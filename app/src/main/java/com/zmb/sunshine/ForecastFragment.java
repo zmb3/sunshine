@@ -22,6 +22,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
+import com.zmb.sunshine.data.db.AndroidDatabaseManager;
 import com.zmb.sunshine.data.db.WeatherContract;
 
 import java.util.Date;
@@ -45,7 +46,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION,
             WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH,
             WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW,
-            WeatherContract.WeatherEntry.COLUMN_LOC_KEY
+            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING // WeatherContract.WeatherEntry.COLUMN_LOC_KEY
     };
 
     // These indices are tied to the columns above.
@@ -54,7 +55,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_DESC = 2;
     public static final int COL_WEATHER_HIGH = 3;
     public static final int COL_WEATHER_LOW = 4;
-    public static final int COL_WEATHER_LOCATION = 5;
+    public static final int COL_LOCATION_SETTING = 5;
 
     private ListView mForecastList;
     private SimpleCursorAdapter mAdapter;
@@ -162,6 +163,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (item.getItemId() == R.id.action_refresh) {
             updateWeather();
             return true;
+        } else if (item.getItemId() == R.id.action_database) {
+            Intent dbMgr = new Intent(getActivity(), AndroidDatabaseManager.class);
+            startActivity(dbMgr);
         }
 
         return super.onOptionsItemSelected(item);
@@ -199,6 +203,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+         if (cursor.getCount() == 0) {
+            Log.w(TAG, "Loader swapping empty cursor");
+        }
         mAdapter.swapCursor(cursor);
     }
 

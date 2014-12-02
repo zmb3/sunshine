@@ -1,52 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
-
-    <!-- change to horizontal and fix this layout -->
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/list_item_forecast_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:minHeight="?android:attr/listPreferredItemHeight"
         android:gravity="center_vertical" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text=" - " />
+        android:text=" - "
+        android:gravity="center_vertical" />
 
     <TextView
         android:id="@+id/list_item_date_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:minHeight="?android:attr/listPreferredItemHeight"
         android:gravity="center_vertical" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text=" - " />
+        android:text=" - "
+        android:gravity="center_vertical" />
 
     <TextView
         android:id="@+id/list_item_high_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:minHeight="?android:attr/listPreferredItemHeight"
         android:gravity="center_vertical" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:text=" - " />
+        android:text=" / "
+        android:gravity="center_vertical" />
 
     <TextView
         android:id="@+id/list_item_low_textview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:minHeight="?android:attr/listPreferredItemHeight"
         android:gravity="center_vertical" />
 

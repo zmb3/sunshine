@@ -5,4 +5,8 @@
         android:id="@+id/action_refresh"
         android:title="@string/refresh"
         android:showAsAction="never" />
+    <item
+        android:id="@+id/action_database"
+        android:title="Show Database"
+        android:showAsAction="never" />
 </menu>

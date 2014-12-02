@@ -38,6 +38,8 @@
                 android:value="com.zmb.sunshine.MainActivity" />
         </activity>
 
+        <activity android:name=".data.db.AndroidDatabaseManager" />
+
         <provider
             android:authorities="com.zmb.sunshine"
             android:name=".data.WeatherProvider" />
