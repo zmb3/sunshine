@@ -56,10 +56,8 @@ public class DetailActivity extends Activity {
 
     public static class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-        public  static final String LOCATION_KEY = "LOCATION_KEY";
+        public static final String LOCATION_KEY = "LOCATION_KEY";
         public static final String DATE_KEY = "DATE_KEY";
-
-        private static final String DEGREES_SYMBOL = "\u00B0";
 
         private static final String[] FORECAST_COLUMNS = {
                 WeatherContract.WeatherEntry.TABLE_NAME + "." + WeatherContract.WeatherEntry._ID,
@@ -119,11 +117,17 @@ public class DetailActivity extends Activity {
 
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            // get the date that was passed when this activity was started
-            String date = getActivity().getIntent().getStringExtra(DATE_KEY);
-            Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(mLocationSetting, date);
-            String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
-            return new CursorLoader(getActivity(), weatherUri, FORECAST_COLUMNS, null, null, sortOrder);
+            mLocationSetting = Sunshine.getPreferredLocation(getActivity());
+
+            // get the info that was passed when this activity was started
+            Intent intent = getActivity().getIntent();
+            if (intent != null) {
+                String date = intent.getStringExtra(DATE_KEY);
+                Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(mLocationSetting, date);
+                String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
+                return new CursorLoader(getActivity(), weatherUri, FORECAST_COLUMNS, null, null, sortOrder);
+            }
+            return null;
         }
 
         @Override
@@ -137,8 +141,9 @@ public class DetailActivity extends Activity {
                 boolean isMetric = Sunshine.isMetric(getActivity());
                 mForecastTextView.setText(desc);
                 mDateTextView.setText(Sunshine.formatDate(date));
-                mHighTextView.setText(Sunshine.formatTemperature(high, isMetric) + DEGREES_SYMBOL);
-                mLowTextView.setText(Sunshine.formatTemperature(low, isMetric) + DEGREES_SYMBOL);
+                mHighTextView.setText(Sunshine.formatTemperature(high, isMetric) + Sunshine.DEGREE_SYMBOL);
+                mHighTextView.setText(Sunshine.formatTemperature(high, isMetric) + Sunshine.DEGREE_SYMBOL);
+                mLowTextView.setText(Sunshine.formatTemperature(low, isMetric) + Sunshine.DEGREE_SYMBOL);
             }
         }
 

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -58,7 +59,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_LOCATION_SETTING = 5;
 
     private ListView mForecastList;
-    private SimpleCursorAdapter mAdapter;
+    private ForecastAdapter mAdapter;
     private String mLocation;
 
     @Override
@@ -83,38 +84,30 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mAdapter = new SimpleCursorAdapter(getActivity(), R.layout.list_item_forecast, null,
-                new String[] { WeatherContract.WeatherEntry.COLUMN_DATETEXT,
-                        WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION,
-                        WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH,
-                        WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW},
-                new int[] { R.id.list_item_date_textview,
-                        R.id.list_item_forecast_textview,
-                        R.id.list_item_high_textview,
-                        R.id.list_item_low_textview}, 0);
+        mAdapter = new ForecastAdapter(getActivity(), null, 0);
 
         // a view binder lets us format the data before it is displayed in the view
-        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int column) {
-                switch (column) {
-                    case COL_WEATHER_HIGH:
-                    case COL_WEATHER_LOW:
-                        // everything in the DB is metric, convert if necessary
-                        double temperatureCelcius = cursor.getDouble(column);
-                        TextView temperature = (TextView) view;
-                        temperature.setText(Sunshine.formatTemperature(temperatureCelcius,
-                                Sunshine.isMetric(getActivity())));
-                        return true;
-                    case COL_WEATHER_DATE:
-                        String date = cursor.getString(column);
-                        TextView dateView = (TextView) view;
-                        dateView.setText(Sunshine.formatDate(date));
-                        return true;
-                    default: return false;
-                }
-            }
-        });
+//        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+//            @Override
+//            public boolean setViewValue(View view, Cursor cursor, int column) {
+//                switch (column) {
+//                    case COL_WEATHER_HIGH:
+//                    case COL_WEATHER_LOW:
+//                        // everything in the DB is metric, convert if necessary
+//                        double temperatureCelcius = cursor.getDouble(column);
+//                        TextView temperature = (TextView) view;
+//                        temperature.setText(Sunshine.formatTemperature(temperatureCelcius,
+//                                Sunshine.isMetric(getActivity())));
+//                        return true;
+//                    case COL_WEATHER_DATE:
+//                        String date = cursor.getString(column);
+//                        TextView dateView = (TextView) view;
+//                        dateView.setText(Sunshine.formatDate(date));
+//                        return true;
+//                    default: return false;
+//                }
+//            }
+//        });
 
         mForecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
         mForecastList.setAdapter(mAdapter);
@@ -136,11 +129,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             }
         });
         return rootView;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -203,9 +191,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-         if (cursor.getCount() == 0) {
-            Log.w(TAG, "Loader swapping empty cursor");
-        }
         mAdapter.swapCursor(cursor);
     }
 

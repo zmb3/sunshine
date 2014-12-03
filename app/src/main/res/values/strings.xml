@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources
+    xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">Sunshine</string>
     <string name="refresh">Refresh</string>
@@ -29,5 +30,17 @@
         <item>@string/pref_units_metric</item>
         <item>@string/pref_units_imperial</item>
     </array>
+
+    <!-- date label for today -->
+    <string name="today">Today</string>
+
+    <!-- date label for tomorrow -->
+    <string name="tomorrow">Tomorrow</string>
+
+    <!-- date format for day of week + date -->
+    <string name="format_full_friendly_date">
+        <xliff:g id="day_of_week">%1$s</xliff:g>
+        <xliff:g id="date">%2$s</xliff:g>
+    </string>
 
 </resources>
