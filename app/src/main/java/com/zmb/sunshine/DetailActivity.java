@@ -141,9 +141,8 @@ public class DetailActivity extends Activity {
                 boolean isMetric = Sunshine.isMetric(getActivity());
                 mForecastTextView.setText(desc);
                 mDateTextView.setText(Sunshine.formatDate(date));
-                mHighTextView.setText(Sunshine.formatTemperature(high, isMetric) + Sunshine.DEGREE_SYMBOL);
-                mHighTextView.setText(Sunshine.formatTemperature(high, isMetric) + Sunshine.DEGREE_SYMBOL);
-                mLowTextView.setText(Sunshine.formatTemperature(low, isMetric) + Sunshine.DEGREE_SYMBOL);
+                mHighTextView.setText(Sunshine.formatTemperature(getActivity(), high, isMetric));
+                mLowTextView.setText(Sunshine.formatTemperature(getActivity(), low, isMetric));
             }
         }
 

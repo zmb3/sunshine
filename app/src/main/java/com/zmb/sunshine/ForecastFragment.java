@@ -117,7 +117,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 // navigate to the detail activity
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
-                SimpleCursorAdapter adapter = (SimpleCursorAdapter) adapterView.getAdapter();
+                CursorAdapter adapter = (CursorAdapter) adapterView.getAdapter();
                 Cursor cursor = adapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     intent.putExtra(DetailActivity.DetailFragment.DATE_KEY, cursor.getString(COL_WEATHER_DATE));

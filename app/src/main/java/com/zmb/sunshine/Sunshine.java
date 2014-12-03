@@ -30,11 +30,11 @@ public class Sunshine {
     private static final SimpleDateFormat sShortDateFormat =
             new SimpleDateFormat("EEE MMM dd");
 
-    public static String formatTemperature(double tempMetric, boolean isMetric) {
+    public static String formatTemperature(Context context, double tempMetric, boolean isMetric) {
         if (!isMetric) {
             tempMetric = Convert.toFahrenheit(tempMetric);
         }
-        return String.format("%.0f", tempMetric);
+        return context.getString(R.string.format_temperature, tempMetric);
     }
 
     public static String formatDate(String dateText) {

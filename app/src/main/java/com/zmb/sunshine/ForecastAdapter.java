@@ -38,34 +38,51 @@ public class ForecastAdapter extends CursorAdapter {
         int layout = getItemViewType(cursor.getPosition()) == VIEW_TYPE_TODAY ?
                 R.layout.list_item_today :
                 R.layout.list_item_forecast;
-        return LayoutInflater.from(context)
-                .inflate(layout, parent, false);
+
+        View root = LayoutInflater.from(context).inflate(layout, parent, false);
+
+        // create a view holder to avoid repeated findViewById() calls
+        ViewHolder holder = new ViewHolder(root);
+        root.setTag(holder);
+        return root;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
+        ViewHolder holder = (ViewHolder) view.getTag();
 
         // use dummy image for now
-        ImageView iv = (ImageView) view.findViewById(R.id.list_item_icon);
-        iv.setImageResource(R.drawable.ic_launcher);
+        holder.mImageView.setImageResource(R.drawable.ic_launcher);
 
         String date = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
-        TextView dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
-        dateView.setText(Sunshine.friendlyDate(context, date));
+        holder.mDateView.setText(Sunshine.friendlyDate(context, date));
 
         String desc = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
-        TextView descView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
-        descView.setText(desc);
+        holder.mForecastView.setText(desc);
 
         boolean isMetric = Sunshine.isMetric(context);
 
         double maxTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_HIGH);
-        TextView maxView = (TextView) view.findViewById(R.id.list_item_high_textview);
-        maxView.setText(Sunshine.formatTemperature(maxTemp, isMetric));
+        holder.mHighView.setText(Sunshine.formatTemperature(context, maxTemp, isMetric));
 
         double minTemp = cursor.getDouble(ForecastFragment.COL_WEATHER_LOW);
-        TextView minView = (TextView) view.findViewById(R.id.list_item_low_textview);
-        minView.setText(Sunshine.formatTemperature(minTemp, isMetric));
+        holder.mLowView.setText(Sunshine.formatTemperature(context, minTemp, isMetric));
+    }
+
+    public static class ViewHolder {
+        public final ImageView mImageView;
+        public final TextView mDateView;
+        public final TextView mForecastView;
+        public final TextView mHighView;
+        public final TextView mLowView;
+
+        public ViewHolder(View parent) {
+            mImageView = (ImageView) parent.findViewById(R.id.list_item_icon);
+            mDateView = (TextView) parent.findViewById(R.id.list_item_date_textview);
+            mForecastView = (TextView) parent.findViewById(R.id.list_item_forecast_textview);
+            mHighView = (TextView) parent.findViewById(R.id.list_item_high_textview);
+            mLowView = (TextView) parent.findViewById(R.id.list_item_low_textview);
+        }
     }
 }
