@@ -114,10 +114,19 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
     }
 
     private ContentValues parseDay(JSONObject day, long locationRowId) throws JSONException {
+
         JSONObject temp = day.getJSONObject("temp");
         final double min = temp.getDouble("min");
         final double max = temp.getDouble("max");
-        final String desc = day.getJSONArray("weather").getJSONObject(0).getString("main");
+
+        final int humidity = day.getInt("humidity");
+        final double pressure = day.getDouble("pressure");
+        final double windSpeed = day.getDouble("speed");
+        final double windDir = day.getDouble("deg");
+
+        JSONObject weather = day.getJSONArray("weather").getJSONObject(0);
+        final String desc = weather.getString("main");
+        final int weatherId = weather.getInt("id");
 
         // open weather map reports the date as a unix timestamp (seconds)
         // convert it to milliseconds to convert to a Date object
@@ -131,14 +140,11 @@ public class OpenWeatherMapParser implements IWeatherDataParser {
         values.put(WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH, max);
         values.put(WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW, min);
         values.put(WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION, desc);
-
-        // TODO: add humidity, pressure, wind speed, wind direction, etc.
-        values.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, 1 /* TODO: weather ID ?> */);
-        values.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, 1);
-        values.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, 1.0);
-        values.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, 1.0);
-        values.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, 1.0);
-
+        values.put(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+        values.put(WeatherContract.WeatherEntry.COLUMN_HUMIDITY, humidity);
+        values.put(WeatherContract.WeatherEntry.COLUMN_PRESSURE, pressure);
+        values.put(WeatherContract.WeatherEntry.COLUMN_DEGREES, windDir);
+        values.put(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
         return values;
     }
 }

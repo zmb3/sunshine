@@ -98,6 +98,39 @@ public class Sunshine {
         return sDayFormat.format(input);
     }
 
+    public static String formatWind(Context c, float speed, float degrees) {
+        int windFormat;
+        if (isMetric(c)) {
+            windFormat = R.string.format_wind_kmh;
+        } else {
+            windFormat = R.string.format_wind_mph;
+            speed *= 0.621371192237334f;
+        }
+        return String.format(c.getString(windFormat), speed, directionFromDegrees(degrees));
+    }
+
+    private static String directionFromDegrees(float degrees) {
+        if (degrees >= 337.5 || degrees < 22.5) {
+            return "N";
+        } else if (degrees >= 22.5 && degrees < 67.5) {
+            return "NE";
+        } else if (degrees >= 67.5 && degrees < 112.5) {
+            return "E";
+        } else if (degrees >= 112.5 && degrees < 157.5) {
+            return "SE";
+        } else if (degrees >= 157.5 && degrees < 202.5) {
+            return"S";
+        } else if (degrees >= 202.5 && degrees < 247.5) {
+            return"SW";
+        } else if (degrees >= 247.5 && degrees < 292.5) {
+            return "W";
+        } else if (degrees >= 292.5 || degrees < 22.5) {
+            return "NW";
+        } else {
+            return "Unknown";
+        }
+    }
+
     public static String getPreferredLocation(Context c) {
         return PreferenceManager.getDefaultSharedPreferences(c).getString(
                 c.getString(R.string.pref_location_key),

@@ -20,8 +20,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TextView;
 
 import com.zmb.sunshine.data.db.AndroidDatabaseManager;
 import com.zmb.sunshine.data.db.WeatherContract;
@@ -86,29 +84,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
         mAdapter = new ForecastAdapter(getActivity(), null, 0);
 
-        // a view binder lets us format the data before it is displayed in the view
-//        mAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-//            @Override
-//            public boolean setViewValue(View view, Cursor cursor, int column) {
-//                switch (column) {
-//                    case COL_WEATHER_HIGH:
-//                    case COL_WEATHER_LOW:
-//                        // everything in the DB is metric, convert if necessary
-//                        double temperatureCelcius = cursor.getDouble(column);
-//                        TextView temperature = (TextView) view;
-//                        temperature.setText(Sunshine.formatTemperature(temperatureCelcius,
-//                                Sunshine.isMetric(getActivity())));
-//                        return true;
-//                    case COL_WEATHER_DATE:
-//                        String date = cursor.getString(column);
-//                        TextView dateView = (TextView) view;
-//                        dateView.setText(Sunshine.formatDate(date));
-//                        return true;
-//                    default: return false;
-//                }
-//            }
-//        });
-
         mForecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
         mForecastList.setAdapter(mAdapter);
 
@@ -120,7 +95,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 CursorAdapter adapter = (CursorAdapter) adapterView.getAdapter();
                 Cursor cursor = adapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    intent.putExtra(DetailActivity.DetailFragment.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
+                    intent.putExtra(DetailFragment.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
                     startActivity(intent);
                 } else {
                     Log.e(TAG, "Couldn't move cursor to position " + position + ", cursor is " + cursor);
