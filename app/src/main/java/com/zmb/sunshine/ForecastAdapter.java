@@ -49,11 +49,15 @@ public class ForecastAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
         ViewHolder holder = (ViewHolder) view.getTag();
 
-        // use dummy image for now
-        holder.mImageView.setImageResource(R.drawable.ic_launcher);
+        // use the art for the first view (today),
+        // and the regular icon for other days
+        int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
+        int imageId = cursor.getPosition() == 0 ?
+                Sunshine.getArtForWeatherId(weatherId) :
+                Sunshine.getIconForWeatherId(weatherId);
+        holder.mImageView.setImageResource(imageId);
 
         String date = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
         holder.mDateView.setText(Sunshine.friendlyDate(context, date));

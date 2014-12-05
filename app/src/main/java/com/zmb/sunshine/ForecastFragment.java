@@ -45,7 +45,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             WeatherContract.WeatherEntry.COLUMN_SHORT_DESCRIPTION,
             WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH,
             WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW,
-            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING // WeatherContract.WeatherEntry.COLUMN_LOC_KEY
+            WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
 
     // These indices are tied to the columns above.
@@ -55,6 +56,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_HIGH = 3;
     public static final int COL_WEATHER_LOW = 4;
     public static final int COL_LOCATION_SETTING = 5;
+    public static final int COL_WEATHER_CONDITION_ID = 6;
 
     private ListView mForecastList;
     private ForecastAdapter mAdapter;
