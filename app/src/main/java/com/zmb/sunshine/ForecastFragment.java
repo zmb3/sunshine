@@ -62,6 +62,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ForecastAdapter mAdapter;
     private String mLocation;
 
+    /**
+     * A callback interface for all activities that
+     * contain this fragment.  This allows activities
+     * to be notified of selections.
+     */
+    public interface Callback {
+        void onItemSelected(String date);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,17 +101,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mForecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // navigate to the detail activity
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-                CursorAdapter adapter = (CursorAdapter) adapterView.getAdapter();
-                Cursor cursor = adapter.getCursor();
+                Cursor cursor = mAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
-                    intent.putExtra(DetailFragment.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
-                    startActivity(intent);
-                } else {
-                    Log.e(TAG, "Couldn't move cursor to position " + position + ", cursor is " + cursor);
+                    // notify the activity that a day was selected
+                    // leave it up to the activity to display the details
+                    String date = cursor.getString(COL_WEATHER_DATE);
+                    ((Callback) getActivity()).onItemSelected(date);
                 }
-
             }
         });
         return rootView;

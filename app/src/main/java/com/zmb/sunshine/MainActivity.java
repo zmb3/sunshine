@@ -2,20 +2,36 @@ package com.zmb.sunshine;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CursorAdapter;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ForecastFragment.Callback {
+
+    private boolean mIsTwoPaneUi = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
-                    .commit();
+
+        // check if we're in two pane UI or single pane
+        if (findViewById(R.id.weather_detail_container) != null) {
+            mIsTwoPaneUi = true;
+
+            // show the detail view in this activity
+            // (we only need to restore the detail fragment if
+            // it wasn't already saved off)
+            if (savedInstanceState== null) {
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.weather_detail_container, new DetailFragment())
+                        .commit();
+            }
+        } else {
+            mIsTwoPaneUi = false;
         }
     }
 
@@ -40,4 +56,26 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Called when a particular day is selected from the forecast list.
+     * @param date
+     */
+    @Override
+    public void onItemSelected(String date) {
+        if (mIsTwoPaneUi) {
+            // on tablets, we replace the detail fragment
+            DetailFragment details = new DetailFragment();
+            Bundle dateBundle = new Bundle();
+            dateBundle.putString(DetailFragment.DATE_KEY, date);
+            details.setArguments(dateBundle);
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.weather_detail_container, details)
+                    .commit();
+        } else {
+            // on phones, we launch the detail activity
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra(DetailFragment.DATE_KEY, date);
+            startActivity(intent);
+        }
+    }
 }

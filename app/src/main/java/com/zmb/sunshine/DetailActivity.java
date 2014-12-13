@@ -6,6 +6,12 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * An activity for displaying a detailed forecast for a particular day.
+ * This activity is only used in the phone (single pane) UI.
+ * In the tablet UI, the forecast list and details vew are shown
+ * in the same activity.
+ */
 public class DetailActivity extends Activity {
 
     @Override
@@ -13,12 +19,16 @@ public class DetailActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
+            String date = getIntent().getStringExtra(DetailFragment.DATE_KEY);
+            Bundle dateInfo = new Bundle();
+            dateInfo.putString(DetailFragment.DATE_KEY, date);
+            DetailFragment details = new DetailFragment();
+            details.setArguments(dateInfo);
             getFragmentManager().beginTransaction()
-                    .add(R.id.container, new DetailFragment())
+                    .add(R.id.weather_detail_container, details)
                     .commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

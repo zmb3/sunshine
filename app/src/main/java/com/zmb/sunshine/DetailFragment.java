@@ -17,6 +17,8 @@ import android.widget.TextView;
 
 import com.zmb.sunshine.data.db.WeatherContract;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOCATION_KEY = "LOCATION_KEY";
@@ -48,7 +50,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView mWindTextView;
     private TextView mPressureTextView;
 
-
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -58,7 +59,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mLocationSetting = savedInstanceState.getString(LOCATION_KEY);
         }
 
-        getLoaderManager().initLoader(0, null, this);
+        Bundle args = getArguments();
+        if (args != null && args.containsKey(DATE_KEY)) {
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     @Override
@@ -66,8 +70,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onResume();
 
         // if the location has changed, then we have to reset the loader to listen for changes on a new URI
-        if (mLocationSetting != null && !mLocationSetting.equals(
-                Sunshine.getPreferredLocation(getActivity()))) {
+        Bundle args = getArguments();
+        if (args != null && args.containsKey(DATE_KEY) &&
+                mLocationSetting != null &&
+                !mLocationSetting.equals(Sunshine.getPreferredLocation(getActivity()))) {
             getLoaderManager().restartLoader(0, null, this);
         }
     }
@@ -99,15 +105,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         mLocationSetting = Sunshine.getPreferredLocation(getActivity());
 
-        // get the info that was passed when this activity was started
-        Intent intent = getActivity().getIntent();
-        if (intent != null) {
-            String date = intent.getStringExtra(DATE_KEY);
-            Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(mLocationSetting, date);
-            String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
-            return new CursorLoader(getActivity(), weatherUri, FORECAST_COLUMNS, null, null, sortOrder);
-        }
-        return null;
+        // get the date that was provided in this fragments arguments
+        String date = getArguments().getString(DATE_KEY);
+        Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(mLocationSetting, date);
+        String sortOrder = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " ASC";
+        return new CursorLoader(getActivity(), weatherUri, FORECAST_COLUMNS, null, null, sortOrder);
     }
 
     @Override
