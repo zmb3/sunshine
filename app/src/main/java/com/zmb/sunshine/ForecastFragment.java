@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 import com.zmb.sunshine.data.db.AndroidDatabaseManager;
@@ -33,6 +31,7 @@ import java.util.Date;
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String TAG = "ForecastFragment";
+    private static final String POSITION_KEY = "position";
 
     private static final int LOADER_ID = 0;
 
@@ -61,6 +60,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ListView mForecastList;
     private ForecastAdapter mAdapter;
     private String mLocation;
+    private int mSelectedPosition = ListView.INVALID_POSITION;
 
     /**
      * A callback interface for all activities that
@@ -101,6 +101,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mForecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                mSelectedPosition = position;
                 Cursor cursor = mAdapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     // notify the activity that a day was selected
@@ -110,6 +111,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 }
             }
         });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(POSITION_KEY)) {
+            mSelectedPosition = savedInstanceState.getInt(POSITION_KEY);
+            // we don't scroll to the position yet, because the list view
+            // probably hasn't been populated yet (waiting for data from loader)
+        }
         return rootView;
     }
 
@@ -141,7 +148,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // save our position so we can ensure that the
+        // selected item is in view when the activity
+        // is recreated
+        if (mSelectedPosition != ListView.INVALID_POSITION) {
+            outState.putInt(POSITION_KEY, mSelectedPosition);
+        }
 
+    }
 
     private void updateWeather() {
         // pull the zip code from the preferences
@@ -174,6 +191,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mAdapter.swapCursor(cursor);
+        if (mSelectedPosition != ListView.INVALID_POSITION) {
+            mForecastList.setSelection(mSelectedPosition);
+        }
     }
 
     @Override

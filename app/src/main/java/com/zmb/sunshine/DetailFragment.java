@@ -4,7 +4,6 @@ package com.zmb.sunshine;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
-import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,8 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.zmb.sunshine.data.db.WeatherContract;
-
-import javax.net.ssl.SSLPeerUnverifiedException;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
