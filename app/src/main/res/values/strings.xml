@@ -43,8 +43,7 @@
 
     <!-- temperature format -->
     <string name="format_temperature">
-        <xliff:g id="temp">%1.0f</xliff:g>
-        <xliff:g>\u00B0</xliff:g>
+        <xliff:g id="temp">%1.0f</xliff:g><xliff:g>\u00B0</xliff:g>
     </string>
 
     <string name="format_wind_mph">
