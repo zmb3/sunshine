@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- in the wide (2-pane) UI, we replace fragment_detail with fragment_detail_wide -->
+    <item type="layout" name="fragment_detail">@layout/fragment_detail_wide</item>
+
+</resources>

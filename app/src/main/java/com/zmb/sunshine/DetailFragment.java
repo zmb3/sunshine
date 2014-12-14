@@ -1,6 +1,5 @@
 package com.zmb.sunshine;
 
-
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
