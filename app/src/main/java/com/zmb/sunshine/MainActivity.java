@@ -1,6 +1,7 @@
 package com.zmb.sunshine;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,6 +16,8 @@ public class MainActivity extends Activity implements ForecastFragment.Callback 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FragmentManager fm = getFragmentManager();
+
         // check if we're in two pane UI or single pane
         if (findViewById(R.id.weather_detail_container) != null) {
             mIsTwoPaneUi = true;
@@ -23,13 +26,16 @@ public class MainActivity extends Activity implements ForecastFragment.Callback 
             // (we only need to restore the detail fragment if
             // it wasn't already saved off)
             if (savedInstanceState== null) {
-                getFragmentManager().beginTransaction()
+                fm.beginTransaction()
                         .replace(R.id.weather_detail_container, new DetailFragment())
                         .commit();
             }
         } else {
             mIsTwoPaneUi = false;
         }
+
+        ForecastFragment ff = (ForecastFragment)(fm.findFragmentById(R.id.fragment_forecast));
+        ff.setUseEnhancedTodayView(!mIsTwoPaneUi);
     }
 
     @Override

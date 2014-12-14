@@ -18,8 +18,15 @@ public class ForecastAdapter extends CursorAdapter {
     private static final int VIEW_TYPE_TODAY = 0;
     private static final int VIEW_TYPE_FUTURE = 1;
 
+    // determines whether the forecast for today uses a special view
+    private boolean mUseDifferentTodayView = true;
+
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+    }
+
+    public void setUseDifferentTodayView(boolean useDifferentView) {
+        mUseDifferentTodayView = useDifferentView;
     }
 
     @Override
@@ -30,7 +37,12 @@ public class ForecastAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE;
+        // on large devices (multi-pane) we always use the same view
+        // on phones, we make the view for today a little bit bigger
+        if (mUseDifferentTodayView) {
+            return position == 0 ? VIEW_TYPE_TODAY : VIEW_TYPE_FUTURE;
+        }
+        return VIEW_TYPE_FUTURE;
     }
 
     @Override

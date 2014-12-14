@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +62,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private ForecastAdapter mAdapter;
     private String mLocation;
     private int mSelectedPosition = ListView.INVALID_POSITION;
+    private boolean mUseEnhancedTodayView = false;
 
     /**
      * A callback interface for all activities that
@@ -94,6 +96,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mAdapter.setUseDifferentTodayView(mUseEnhancedTodayView);
 
         mForecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
         mForecastList.setAdapter(mAdapter);
@@ -157,7 +160,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (mSelectedPosition != ListView.INVALID_POSITION) {
             outState.putInt(POSITION_KEY, mSelectedPosition);
         }
+    }
 
+    /**
+     * Configure how the fragment displays today's forecast.
+     * Today's forecast can either use a larger, enhanced view,
+     * or a standard view.
+     * @param useEnhancedView true to use the enhanced view for today,
+     *                        false otherwise
+     */
+    public void setUseEnhancedTodayView(boolean useEnhancedView) {
+        mUseEnhancedTodayView = useEnhancedView;
+        if (mAdapter != null) {
+            mAdapter.setUseDifferentTodayView(useEnhancedView);
+        } else {
+            Log.e(TAG, "Adapter hasn't been created yet.");
+        }
     }
 
     private void updateWeather() {
