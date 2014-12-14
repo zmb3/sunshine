@@ -3,7 +3,6 @@ package com.zmb.sunshine;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.zmb.sunshine.data.IWeatherDataParser;
 import com.zmb.sunshine.data.WeatherParseException;
@@ -55,7 +54,6 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             return null;
         } catch (IOException e) {
             Log.e(TAG, "Error fetching weather", e);
-            Toast.makeText(mContext, "There was an error fetching weather data.", Toast.LENGTH_LONG).show();
         } catch (WeatherParseException wpe) {
             Log.e(TAG, "Failed to parse weather");
         } finally {

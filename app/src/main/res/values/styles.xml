@@ -1,12 +1,27 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="android:Theme.Material.Light">
+        <!-- Material Theme only requires us to set a primary color for the status bar -->
+        <item name="android:colorPrimary">@color/sunshine_light_blue</item>
+        <item name="android:colorPrimaryDark">@color/sunshine_blue</item>
     </style>
 
+    <!-- TODO: use logo on MainActivity -->
+
+    <!--<style name="ForecastTheme" parent="AppTheme">-->
+        <!--<item name="actionBarStyle">@style/ActionBar.Solid.Sunshine.NoTitle</item>-->
+    <!--</style>-->
+
+
+    <!--<style name="ActionBar.Solid.Sunshine.NoTitle" parent="@style/ActionBar.Solid.Sunshine">-->
+        <!--<item name="android:displayOptions">useLogo|showHome</item>-->
+        <!--<item name="android:logo">@drawable/ic_logo</item>-->
+    <!--</style>-->
+
     <style name="ForecastListStyle">
-        <!-- empty here, because in the default case we don't do anything -->
+        <!-- empty here, because in the default case we don't do anything
+             (overridden in values-sw600dp/styles.xml) -->
     </style>
 
 </resources>

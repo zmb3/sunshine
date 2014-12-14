@@ -4,11 +4,9 @@
 
     <string name="app_name">Sunshine</string>
     <string name="refresh">Refresh</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_detail">DetailActivity</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_settings">SettingsActivity</string>
+    <string name="title_activity_detail">Forecast Details</string>
+    <string name="title_activity_settings">Settings</string>
 
     <!-- preferences -->
     <string name="pref_location_key" translatable="false">zip_code</string>
