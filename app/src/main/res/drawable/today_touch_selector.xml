@@ -11,6 +11,6 @@
         android:drawable="@color/sunshine_light_blue" />
 
     <!-- default -->
-    <item android:drawable="@android:color/transparent" />
+    <item android:drawable="@color/sunshine_light_blue" />
 
 </selector>
