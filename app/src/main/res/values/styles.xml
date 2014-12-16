@@ -5,6 +5,11 @@
         <!-- Material Theme only requires us to set a primary color for the status bar -->
         <item name="android:colorPrimary">@color/sunshine_light_blue</item>
         <item name="android:colorPrimaryDark">@color/sunshine_blue</item>
+        <item name="android:actionBarStyle">@style/MyActionBarStyle</item>
+    </style>
+
+    <style name="MyActionBarStyle" parent="@android:style/Widget.Material.ActionBar.Solid">
+        <item name="android:elevation">0dp</item>
     </style>
 
     <!-- TODO: use logo on MainActivity -->

@@ -14,11 +14,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:textSize="24sp"
+            android:textColor="@android:color/black"
             android:id="@+id/detail_day_textview" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:textSize="16sp"
+            android:textColor="@color/light_grey"
             android:id="@+id/detail_date_textview" />
 
         <LinearLayout
@@ -32,19 +36,22 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:gravity="center"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/detail_high_textview"
-                    android:text="hello"/>
+                    android:textSize="96sp"
+                    android:textColor="@android:color/black" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/detail_low_textview"
-                    android:text="world"/>
+                    android:textSize="48sp"
+                    android:textColor="@color/light_grey" />
 
 
             </LinearLayout>
@@ -59,12 +66,12 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/detail_icon"
-                    android:src="@drawable/ic_launcher"/>
+                    android:id="@+id/detail_icon" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:textAppearance="?android:textAppearanceMedium"
                     android:id="@+id/detail_forecast_textview" />
 
             </LinearLayout>
@@ -74,17 +81,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_humitidy_textview" />
+            android:id="@+id/detail_humitidy_textview"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_wind_textview" />
+            android:id="@+id/detail_wind_textview"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/detail_pressure_textview" />
+            android:id="@+id/detail_pressure_textview"
+            android:textAppearance="?android:textAppearanceMedium" />
 
     </LinearLayout>
 </ScrollView>
