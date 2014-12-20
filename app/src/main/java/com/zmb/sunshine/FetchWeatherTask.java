@@ -54,8 +54,6 @@ class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             return null;
         } catch (IOException e) {
             Log.e(TAG, "Error fetching weather", e);
-        } catch (WeatherParseException wpe) {
-            Log.e(TAG, "Failed to parse weather");
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();

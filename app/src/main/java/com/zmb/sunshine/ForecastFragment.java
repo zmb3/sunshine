@@ -22,6 +22,7 @@ import android.widget.ListView;
 
 import com.zmb.sunshine.data.db.AndroidDatabaseManager;
 import com.zmb.sunshine.data.db.WeatherContract;
+import com.zmb.sunshine.service.SunshineService;
 
 import java.util.Date;
 
@@ -180,9 +181,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private void updateWeather() {
         // pull the zip code from the preferences
-        // and use it to fetch weather data
+        // and use it to start a service that will fetch weather data
         mLocation = getPreferredLocation();
-        new FetchWeatherTask(getActivity()).execute(mLocation);
+        Intent intent = new Intent(getActivity(), SunshineService.class);
+        intent.putExtra(SunshineService.EXTRA_LOCATION, mLocation);
+        getActivity().startService(intent);
     }
 
     private String getPreferredLocation() {
