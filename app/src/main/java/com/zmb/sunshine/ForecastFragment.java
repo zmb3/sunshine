@@ -1,7 +1,10 @@
 package com.zmb.sunshine;
 
+import android.app.AlarmManager;
 import android.app.Fragment;
 import android.app.LoaderManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -9,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +28,7 @@ import com.zmb.sunshine.data.db.AndroidDatabaseManager;
 import com.zmb.sunshine.data.db.WeatherContract;
 import com.zmb.sunshine.service.SunshineService;
 
+import java.net.ContentHandler;
 import java.util.Date;
 
 /**
@@ -183,9 +188,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // pull the zip code from the preferences
         // and use it to start a service that will fetch weather data
         mLocation = getPreferredLocation();
-        Intent intent = new Intent(getActivity(), SunshineService.class);
+        AlarmManager alarm = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
         intent.putExtra(SunshineService.EXTRA_LOCATION, mLocation);
-        getActivity().startService(intent);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(getActivity(), 0,
+                intent, PendingIntent.FLAG_ONE_SHOT);
+
+        // alarm for 5 seconds from now
+        alarm.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, alarmIntent);
     }
 
     private String getPreferredLocation() {

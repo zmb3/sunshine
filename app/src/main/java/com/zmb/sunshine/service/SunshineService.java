@@ -1,6 +1,8 @@
 package com.zmb.sunshine.service;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -55,6 +57,16 @@ public class SunshineService extends IntentService {
                     connection.disconnect();
                 }
             }
+        }
+    }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent serviceIntent = new Intent(context, SunshineService.class);
+            serviceIntent.putExtra(EXTRA_LOCATION, intent.getStringExtra(EXTRA_LOCATION));
+            context.startService(serviceIntent);
         }
     }
 }
