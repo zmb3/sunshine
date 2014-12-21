@@ -61,5 +61,6 @@
     <string name="format_humidity">
         Humidity: <xliff:g id="humidity">%1.0f</xliff:g> %%
     </string>
+    <string name="location_on_map">Show Location on Map</string>
 
 </resources>

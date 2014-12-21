@@ -30,6 +30,7 @@ import com.zmb.sunshine.service.SunshineService;
 
 import java.net.ContentHandler;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * A fragment for displaying the overall forecast for
@@ -152,6 +153,17 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         } else if (item.getItemId() == R.id.action_database) {
             Intent dbMgr = new Intent(getActivity(), AndroidDatabaseManager.class);
             startActivity(dbMgr);
+        } else if (item.getItemId() == R.id.action_show_on_map) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            Uri location = Uri.parse("geo:0,0?").buildUpon()
+                    .appendQueryParameter("q", Sunshine.getPreferredLocation(getActivity()))
+                    .build();
+            intent.setData(location);
+            // resolveActivity makes sure there is an application that
+            // can handle the intent before we send it
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivity(intent);
+            }
         }
 
         return super.onOptionsItemSelected(item);

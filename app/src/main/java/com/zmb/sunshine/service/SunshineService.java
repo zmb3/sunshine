@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.util.Log;
 
 import com.zmb.sunshine.data.IWeatherDataParser;
+import com.zmb.sunshine.data.db.WeatherContract;
 import com.zmb.sunshine.data.openweathermap.OpenWeatherMapParser;
 import com.zmb.utils.IoUtils;
 
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 
 /**
  * An {@link IntentService} subclass for refreshing weather data in
@@ -39,6 +41,8 @@ public class SunshineService extends IntentService {
             String location = intent.getStringExtra(EXTRA_LOCATION);
             HttpURLConnection connection = null;
             try {
+                removeOldWeatherData();
+
                 URL url = mParser.buildUrl(location, DAYS_TO_FETCH);
                 Log.v(TAG, "Querying " + url.toString());
 
@@ -59,6 +63,17 @@ public class SunshineService extends IntentService {
             }
         }
     }
+
+    private void removeOldWeatherData() {
+        String today = WeatherContract.convertDateToString(new Date());
+        String where = WeatherContract.WeatherEntry.COLUMN_DATETEXT + " < ?";
+
+        int rowsDeleted = getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI,
+                where, new String[] { today });
+
+        Log.d(TAG, "Removed " + rowsDeleted + " rows of old weather data");
+    }
+
 
     public static class AlarmReceiver extends BroadcastReceiver {
 
