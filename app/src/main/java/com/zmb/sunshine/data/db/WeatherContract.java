@@ -72,6 +72,12 @@ public class WeatherContract {
                     .appendQueryParameter(COLUMN_DATETEXT, date).build();
         }
 
+        public static Uri buildWeatherLocatinWithStartAndEndDate(String location, String start, String end) {
+            return CONTENT_URI.buildUpon().appendPath(location)
+                    .appendQueryParameter(COLUMN_DATETEXT, start)
+                    .appendQueryParameter(QUERY_PARAM_END_DATE, end).build();
+        }
+
         public static String getLocationSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
@@ -82,6 +88,10 @@ public class WeatherContract {
 
         public static String getStartDateFromUri(Uri uri) {
             return uri.getQueryParameter(COLUMN_DATETEXT);
+        }
+
+        public static String getEndDateFromUri(Uri uri) {
+            return uri.getQueryParameter(QUERY_PARAM_END_DATE);
         }
 
         public static final String TABLE_NAME = "weather";
@@ -95,6 +105,8 @@ public class WeatherContract {
          * The date, stored as text of the form yyyy-MM-dd.
          */
         public static final String COLUMN_DATETEXT = "date";
+
+        public static final String QUERY_PARAM_END_DATE = "end_date";
 
         public static final String COLUMN_WEATHER_ID = "weather_id";
 

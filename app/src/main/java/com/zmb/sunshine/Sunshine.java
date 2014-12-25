@@ -76,6 +76,19 @@ public class Sunshine {
         return  sShortDateFormat.format(input);
     }
 
+    public static String shortFriendlyDate(Context context, String dateText) {
+        String day = dayName(context, dateText);
+
+        // for today and tomorrow, we still return today and tomorrow
+        if (day.equals(context.getString(R.string.today)) ||
+                day.equals(context.getString(R.string.tomorrow))) {
+            return day;
+        }
+        // for other days, just return the first 3 letters of the day
+        // ie: "Sun", "Mon", etc.
+        return day.substring(0, 3);
+    }
+
     public static String formattedMonthDay(Context context, String date) {
         try {
             Date input = sDatabaseFormat.parse(date);

@@ -70,7 +70,7 @@ public class WeatherProvider extends ContentProvider {
                 result = getWeatherByLocation(uri, projection, sortOrder);
                 break;
             case WEATHER_WITH_LOCATION_AND_DATE:
-                result = getWeatherByLocationWithDate(uri, projection, sortOrder);
+                result = getWeatherByLocationWithExactDate(uri, projection, sortOrder);
                 break;
             case LOCATION:
                 result = mOpenHelper.getReadableDatabase().query(
@@ -221,7 +221,7 @@ public class WeatherProvider extends ContentProvider {
         UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         matcher.addURI(WeatherContract.CONTENT_AUTHORITY, WeatherContract.PATH_WEATHER, WEATHER);
 
-        // date is always numeric, but we store it in the DB as a string
+        // date is always numeric, but we store it in the DB as a string ("*" character)
         matcher.addURI(WeatherContract.CONTENT_AUTHORITY, WeatherContract.PATH_WEATHER + "/*", WEATHER_WITH_LOCATION);
         matcher.addURI(WeatherContract.CONTENT_AUTHORITY, WeatherContract.PATH_WEATHER + "/*/*", WEATHER_WITH_LOCATION_AND_DATE);
 
@@ -234,6 +234,7 @@ public class WeatherProvider extends ContentProvider {
     private Cursor getWeatherByLocation(Uri uri, String[] projection, String sortOrder) {
         String location = WeatherContract.WeatherEntry.getLocationSettingFromUri(uri);
         String startDate = WeatherContract.WeatherEntry.getStartDateFromUri(uri);
+        String endDate = WeatherContract.WeatherEntry.getEndDateFromUri(uri);
 
         String selection;
         String[] selectionArgs;
@@ -241,16 +242,22 @@ public class WeatherProvider extends ContentProvider {
         if (startDate == null) {
             selection = sLocationSelection;
             selectionArgs = new String[] { location };
+        } else if (endDate != null) {
+            // we have a start AND end date
+            selection = sLocationSelectionWithStartDate + " AND " +
+                    WeatherContract.WeatherEntry.COLUMN_DATETEXT + " < ? ";
+            selectionArgs = new String[] { location, startDate, endDate };
         } else {
             selection = sLocationSelectionWithStartDate;
             selectionArgs = new String[] { location, startDate };
+
         }
 
         return sQueryBuilder.query(mOpenHelper.getReadableDatabase(), projection,
                 selection, selectionArgs, null, null, sortOrder);
     }
 
-    private Cursor getWeatherByLocationWithDate(Uri uri, String[] projection, String sortOrder) {
+    private Cursor getWeatherByLocationWithExactDate(Uri uri, String[] projection, String sortOrder) {
         String location = WeatherContract.WeatherEntry.getLocationSettingFromUri(uri);
         String date = WeatherContract.WeatherEntry.getDateFromUri(uri);
 
