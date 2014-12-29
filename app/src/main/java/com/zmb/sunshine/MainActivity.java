@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.zmb.sunshine.sync.SunshineSyncAdapter;
+
 public class MainActivity extends Activity implements ForecastFragment.Callback {
 
     private boolean mIsTwoPaneUi = false;
@@ -36,6 +38,9 @@ public class MainActivity extends Activity implements ForecastFragment.Callback 
 
         ForecastFragment ff = (ForecastFragment)(fm.findFragmentById(R.id.fragment_forecast));
         ff.setUseEnhancedTodayView(!mIsTwoPaneUi);
+
+        SunshineSyncAdapter.initialize(this);
+        SunshineSyncAdapter.syncNow(this);
     }
 
     @Override

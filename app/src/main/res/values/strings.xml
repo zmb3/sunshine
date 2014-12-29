@@ -45,4 +45,8 @@
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
 
+    <!-- SyncAdapter info -->
+    <string name="sync_account_type">sunshine.example.com</string>
+    <string name="content_authority">com.zmb.sunshine</string>
+
 </resources>

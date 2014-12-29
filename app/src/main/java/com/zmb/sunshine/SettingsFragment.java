@@ -7,6 +7,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import com.zmb.sunshine.data.db.WeatherContract;
+import com.zmb.sunshine.sync.SunshineSyncAdapter;
 import com.zmb.sunshine.widget.SunshineWidget;
 
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
@@ -58,10 +59,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         if (!mIsBindingPreference) {
             // if the location setting has changed, we need to fetch new data
             if (preference.getKey().equals(getString(R.string.pref_location_key))) {
-                // TODO: we're not using the task anymore
-                FetchWeatherTask task = new FetchWeatherTask(getActivity());
-                String location = value.toString();
-                task.execute(location);
+                SunshineSyncAdapter.syncNow(getActivity());
             } else {
 
                 // weather data may need to be updated (ie units changed)

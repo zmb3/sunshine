@@ -23,6 +23,11 @@ import java.util.Date;
  */
 public class SunshineWidget extends AppWidgetProvider {
 
+    // TODO: default size
+    // TODO: preview image
+    // TODO: click opens Sunshine app
+    // TODO: background color from wallpaper ??
+
     private static final String TAG = "Widget";
 
     private static final String[] COLUMNS = {
@@ -38,7 +43,6 @@ public class SunshineWidget extends AppWidgetProvider {
     private static final int COL_WEATHER_ID = 3;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.v(TAG, "onUpdate");
         boolean isMetric = Sunshine.isMetric(context);
         // There may be multiple widgets active, so update all of them
         for (int i = 0; i < appWidgetIds.length; ++i) {
@@ -85,19 +89,17 @@ public class SunshineWidget extends AppWidgetProvider {
         Log.v(TAG, "Forcing widget update");
         AppWidgetManager manager = AppWidgetManager.getInstance(context);
         ComponentName component = new ComponentName(context.getApplicationContext(), SunshineWidget.class);
-        int[] ids = manager.getAppWidgetIds(component);
-        for (int i = 0; i < ids.length; ++i) {
-            updateAppWidget(context, manager, ids[i], isMetric);
+        for (int id : manager.getAppWidgetIds(component)) {
+            updateAppWidget(context, manager, id, isMetric);
         }
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
             int appWidgetId, boolean isMetric) {
-
         Date todaysDate = new Date();
         String today = WeatherContract.convertDateToString(todaysDate);
 
-        // we only want to query 3 days
+        // we only want to query for 3 days of data
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(todaysDate);
         calendar.add(Calendar.DATE, 3);
@@ -108,6 +110,7 @@ public class SunshineWidget extends AppWidgetProvider {
         Uri uri = WeatherContract.WeatherEntry.buildWeatherLocatinWithStartAndEndDate(
                 Sunshine.getPreferredLocation(context), today, end);
 
+        // TODO: we might want to do the query in the background
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(uri, COLUMNS, null, null, sortOrder);
 
@@ -143,7 +146,6 @@ public class SunshineWidget extends AppWidgetProvider {
         } finally {
             cursor.close();
         }
-
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
