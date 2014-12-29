@@ -7,7 +7,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 
 import com.zmb.sunshine.data.db.WeatherContract;
-
+import com.zmb.sunshine.widget.SunshineWidget;
 
 public class SettingsFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
 
@@ -58,15 +58,27 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         if (!mIsBindingPreference) {
             // if the location setting has changed, we need to fetch new data
             if (preference.getKey().equals(getString(R.string.pref_location_key))) {
+                // TODO: we're not using the task anymore
                 FetchWeatherTask task = new FetchWeatherTask(getActivity());
                 String location = value.toString();
                 task.execute(location);
             } else {
+
                 // weather data may need to be updated (ie units changed)
                 getActivity().getContentResolver().notifyChange(
                         WeatherContract.WeatherEntry.CONTENT_URI, null);
+
+                if (preference.getKey().equals(getString(R.string.pref_units_key))) {
+                    // we have to explicitly pass the "isMetric" parameter, since
+                    // the preference hasn't actually changed yet
+                    // (Sunshine.isMetric() won't return the new value)
+                    boolean isMetric = value.toString().equals(getString(R.string.pref_units_metric));
+                    SunshineWidget.updateAllWidgets(getActivity(), isMetric);
+                }
             }
         }
+
+
 
         if (preference instanceof ListPreference) {
             // for ListPreferences, look up the correct display value

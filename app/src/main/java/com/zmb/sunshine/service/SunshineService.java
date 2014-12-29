@@ -9,6 +9,7 @@ import android.util.Log;
 import com.zmb.sunshine.data.IWeatherDataParser;
 import com.zmb.sunshine.data.db.WeatherContract;
 import com.zmb.sunshine.data.openweathermap.OpenWeatherMapParser;
+import com.zmb.sunshine.widget.SunshineWidget;
 import com.zmb.utils.IoUtils;
 
 import java.io.IOException;
@@ -53,6 +54,9 @@ public class SunshineService extends IntentService {
                 InputStream inputStream = connection.getInputStream();
                 String response = IoUtils.readAll(inputStream);
                 mParser.parse(this, response, DAYS_TO_FETCH);
+
+                // update any widgets with the new data
+                SunshineWidget.updateAllWidgets(this);
 
             } catch (IOException e) {
                 Log.e(TAG, "Failed to fetch weather", e);

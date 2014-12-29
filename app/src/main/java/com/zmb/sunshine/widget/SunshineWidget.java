@@ -2,10 +2,9 @@ package com.zmb.sunshine.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -26,23 +25,24 @@ public class SunshineWidget extends AppWidgetProvider {
 
     private static final String TAG = "Widget";
 
-    private static final int LOADER_ID = 55312;
-
     private static final String[] COLUMNS = {
             WeatherContract.WeatherEntry.COLUMN_DATETEXT,
             WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_HIGH,
-            WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW
+            WeatherContract.WeatherEntry.COLUMN_TEMPERATURE_LOW,
+            WeatherContract.WeatherEntry.COLUMN_WEATHER_ID
     };
 
     private static final int COL_DATE = 0;
     private static final int COL_HIGH = 1;
     private static final int COL_LOW = 2;
+    private static final int COL_WEATHER_ID = 3;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.v(TAG, "onUpdate");
+        boolean isMetric = Sunshine.isMetric(context);
         // There may be multiple widgets active, so update all of them
-        for (int i = 0; i < appWidgetIds.length; i++) {
-            updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
+        for (int i = 0; i < appWidgetIds.length; ++i) {
+            updateAppWidget(context, appWidgetManager, appWidgetIds[i], isMetric);
         }
     }
 
@@ -73,8 +73,26 @@ public class SunshineWidget extends AppWidgetProvider {
         Log.v(TAG, "App widget disabled");
     }
 
-    void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                         int appWidgetId) {
+    /**
+     * Utility method for forcing an update of all Sunshine widgets.
+     * @param context
+     */
+    public static void updateAllWidgets(Context context) {
+        updateAllWidgets(context, Sunshine.isMetric(context));
+    }
+
+    public static void updateAllWidgets(Context context, boolean isMetric) {
+        Log.v(TAG, "Forcing widget update");
+        AppWidgetManager manager = AppWidgetManager.getInstance(context);
+        ComponentName component = new ComponentName(context.getApplicationContext(), SunshineWidget.class);
+        int[] ids = manager.getAppWidgetIds(component);
+        for (int i = 0; i < ids.length; ++i) {
+            updateAppWidget(context, manager, ids[i], isMetric);
+        }
+    }
+
+    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+            int appWidgetId, boolean isMetric) {
 
         Date todaysDate = new Date();
         String today = WeatherContract.convertDateToString(todaysDate);
@@ -92,42 +110,43 @@ public class SunshineWidget extends AppWidgetProvider {
 
         ContentResolver resolver = context.getContentResolver();
         Cursor cursor = resolver.query(uri, COLUMNS, null, null, sortOrder);
-        RemoteViews views;
 
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sunshine_widget);
         try {
             // update views - just brute force each of 3 days
-            views = new RemoteViews(context.getPackageName(), R.layout.sunshine_widget);
-            boolean isMetric = Sunshine.isMetric(context);
             if (cursor.moveToFirst()) {
+                Log.v(TAG, "A");
                 String temperature = Sunshine.formatTemperature(context, cursor.getDouble(COL_HIGH), isMetric) +
                         " / " + Sunshine.formatTemperature(context, cursor.getDouble(COL_LOW), isMetric);
                 views.setTextViewText(R.id.widget_day_text0, Sunshine.shortFriendlyDate(context, cursor.getString(COL_DATE)));
                 views.setTextViewText(R.id.widget_temperature_text0, temperature);
-                views.setImageViewResource(R.id.widget_icon0, R.drawable.ic_clear); // TODO:
+                views.setImageViewResource(R.id.widget_icon0, Sunshine.getIconForWeatherId(cursor.getInt(COL_WEATHER_ID)));
             }
 
             if (cursor.moveToNext()) {
+                Log.v(TAG, "B");
                 String temperature = Sunshine.formatTemperature(context, cursor.getDouble(COL_HIGH), isMetric) +
                         " / " + Sunshine.formatTemperature(context, cursor.getDouble(COL_LOW), isMetric);
                 views.setTextViewText(R.id.widget_day_text1, Sunshine.shortFriendlyDate(context, cursor.getString(COL_DATE)));
                 views.setTextViewText(R.id.widget_temperature_text1, temperature);
-                views.setImageViewResource(R.id.widget_icon1, R.drawable.ic_snow); // TODO:
+                views.setImageViewResource(R.id.widget_icon1, Sunshine.getIconForWeatherId(cursor.getInt(COL_WEATHER_ID)));
             }
 
             if (cursor.moveToNext()) {
+                Log.v(TAG, "C");
                 String temperature = Sunshine.formatTemperature(context, cursor.getDouble(COL_HIGH), isMetric) +
                         " / " + Sunshine.formatTemperature(context, cursor.getDouble(COL_LOW), isMetric);
                 views.setTextViewText(R.id.widget_day_text2, Sunshine.shortFriendlyDate(context, cursor.getString(COL_DATE)));
                 views.setTextViewText(R.id.widget_temperature_text2, temperature);
-                views.setImageViewResource(R.id.widget_icon2, R.drawable.ic_fog); // TODO:
+                views.setImageViewResource(R.id.widget_icon2, Sunshine.getIconForWeatherId(cursor.getInt(COL_WEATHER_ID)));
             }
         } finally {
             cursor.close();
         }
 
+
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
-
 
     }
 
