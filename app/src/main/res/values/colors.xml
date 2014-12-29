@@ -5,5 +5,7 @@
     <color name="light_grey">#646464</color>
     <color name="sunshine_light_blue">#ff64c2f4</color>
     <color name="sunshine_blue">#ff1ca8f4</color>
+    <color name="now_light_text">#dedede</color>
+    <color name="now_dark_text">#878787</color>
 
 </resources>

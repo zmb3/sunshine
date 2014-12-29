@@ -6,14 +6,19 @@
     android:orientation="horizontal"
     android:padding="@dimen/widget_margin"
     android:gravity="center_horizontal"
-    android:background="#09C">
+    android:background="#e3e3e3"
+    android:showDividers="middle"
+    android:divider="@drawable/divider"
+    android:dividerPadding="10dp">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+    <LinearLayout style="@style/WidgetDayStyle">
+
+        <TextView
+            android:id="@+id/widget_day_text0"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            tools:text="Sun"/>
 
         <ImageView
             android:id="@+id/widget_icon0"
@@ -22,25 +27,22 @@
             tools:src="@drawable/ic_clear" />
 
         <TextView
-            android:id="@+id/widget_day_text0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Sun"/>
-
-        <TextView
             android:id="@+id/widget_temperature_text0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/now_dark_text"
             tools:text="64 / 52"/>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+    <LinearLayout style="@style/WidgetDayStyle">
+
+        <TextView
+            android:id="@+id/widget_day_text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            tools:text="Mon"/>
 
         <ImageView
             android:id="@+id/widget_icon1"
@@ -49,25 +51,22 @@
             tools:src="@drawable/ic_snow"/>
 
         <TextView
-            android:id="@+id/widget_day_text1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Mon"/>
-
-        <TextView
             android:id="@+id/widget_temperature_text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/now_dark_text"
             tools:text="51 / 44"/>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+    <LinearLayout style="@style/WidgetDayStyle">
+
+        <TextView
+            android:id="@+id/widget_day_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            tools:text="Tue"/>
 
         <ImageView
             android:id="@+id/widget_icon2"
@@ -76,15 +75,10 @@
             tools:src="@drawable/ic_snow"/>
 
         <TextView
-            android:id="@+id/widget_day_text2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="Mon"/>
-
-        <TextView
             android:id="@+id/widget_temperature_text2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/now_dark_text"
             tools:text="51 / 44"/>
 
     </LinearLayout>
