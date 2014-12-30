@@ -1,16 +1,19 @@
 package com.zmb.sunshine.widget;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.zmb.sunshine.MainActivity;
 import com.zmb.sunshine.R;
 import com.zmb.sunshine.Sunshine;
 import com.zmb.sunshine.data.db.WeatherContract;
@@ -23,9 +26,6 @@ import java.util.Date;
  */
 public class SunshineWidget extends AppWidgetProvider {
 
-    // TODO: default size
-    // TODO: preview image
-    // TODO: click opens Sunshine app
     // TODO: background color from wallpaper ??
 
     private static final String TAG = "Widget";
@@ -115,6 +115,12 @@ public class SunshineWidget extends AppWidgetProvider {
         Cursor cursor = resolver.query(uri, COLUMNS, null, null, sortOrder);
 
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sunshine_widget);
+
+        // clicking the widget should open the sunshine App
+        Intent startApp = new Intent(context, MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, startApp, 0);
+        views.setOnClickPendingIntent(R.id.widget_main_layout, pendingIntent);
+
         try {
             // update views - just brute force each of 3 days
             if (cursor.moveToFirst()) {
