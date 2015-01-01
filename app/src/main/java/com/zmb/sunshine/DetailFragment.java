@@ -123,7 +123,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
             boolean isMetric = Sunshine.isMetric(getActivity());
 
-            mIconView.setImageResource(Sunshine.getArtForWeatherId(weatherId));
+            mIconView.setImageResource(Sunshine.getArtForWeatherId(
+                    WeatherContract.WeatherId.fromInt(weatherId)));
+
             mForecastTextView.setText(desc);
             mDateTextView.setText(Sunshine.formatDate(date));
             mDayTextView.setText(Sunshine.dayName(getActivity(), date));

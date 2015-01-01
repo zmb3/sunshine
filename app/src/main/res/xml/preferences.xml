@@ -16,4 +16,11 @@
         android:entryValues="@array/pref_units_value"
         android:entries="@array/pref_units_options" />
 
+    <ListPreference
+        android:key="@string/pref_weather_provider_key"
+        android:title="@string/pref_weather_provider_label"
+        android:defaultValue="@string/pref_weather_provider_openweathermap"
+        android:entryValues="@array/pref_weather_provider_values"
+        android:entries="@array/pref_weather_provider_options" />
+
 </PreferenceScreen>

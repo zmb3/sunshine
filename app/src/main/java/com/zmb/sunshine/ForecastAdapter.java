@@ -9,6 +9,8 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zmb.sunshine.data.db.WeatherContract;
+
 /**
  * A custom CursorAdapter that allows today's forecast
  * to use a different layout than the other days.
@@ -66,9 +68,10 @@ public class ForecastAdapter extends CursorAdapter {
         // use the art for the first view (today),
         // and the regular icon for other days
         int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID);
+        WeatherContract.WeatherId id = WeatherContract.WeatherId.fromInt(weatherId);
         int imageId = cursor.getPosition() == 0 ?
-                Sunshine.getArtForWeatherId(weatherId) :
-                Sunshine.getIconForWeatherId(weatherId);
+                Sunshine.getArtForWeatherId(id) :
+                Sunshine.getIconForWeatherId(id);
         holder.mImageView.setImageResource(imageId);
 
         String date = cursor.getString(ForecastFragment.COL_WEATHER_DATE);

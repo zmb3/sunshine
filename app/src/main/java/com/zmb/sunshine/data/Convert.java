@@ -7,11 +7,12 @@ public class Convert {
     private Convert() { }
 
     /**
-     * Convert a temperature in celcius to degrees fahrenheit.
-     * @param celcius
+     * Convert a temperature in celsius to degrees fahrenheit.
+     * @param celsius
      * @return
      */
-    public static double toFahrenheit(double celcius) {
-        return celcius * 1.8 + 32d;
+    public static double toFahrenheit(double celsius) {
+        return celsius * 1.8 + 32d;
     }
+    
 }

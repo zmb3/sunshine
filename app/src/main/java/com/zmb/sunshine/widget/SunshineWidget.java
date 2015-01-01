@@ -129,7 +129,8 @@ public class SunshineWidget extends AppWidgetProvider {
                         " / " + Sunshine.formatTemperature(context, cursor.getDouble(COL_LOW), isMetric);
                 views.setTextViewText(R.id.widget_day_text0, Sunshine.shortFriendlyDate(context, cursor.getString(COL_DATE)));
                 views.setTextViewText(R.id.widget_temperature_text0, temperature);
-                views.setImageViewResource(R.id.widget_icon0, Sunshine.getIconForWeatherId(cursor.getInt(COL_WEATHER_ID)));
+                views.setImageViewResource(R.id.widget_icon0, Sunshine.getIconForWeatherId(
+                        WeatherContract.WeatherId.fromInt(cursor.getInt(COL_WEATHER_ID))));
             }
 
             if (cursor.moveToNext()) {
@@ -138,7 +139,8 @@ public class SunshineWidget extends AppWidgetProvider {
                         " / " + Sunshine.formatTemperature(context, cursor.getDouble(COL_LOW), isMetric);
                 views.setTextViewText(R.id.widget_day_text1, Sunshine.shortFriendlyDate(context, cursor.getString(COL_DATE)));
                 views.setTextViewText(R.id.widget_temperature_text1, temperature);
-                views.setImageViewResource(R.id.widget_icon1, Sunshine.getIconForWeatherId(cursor.getInt(COL_WEATHER_ID)));
+                views.setImageViewResource(R.id.widget_icon1, Sunshine.getIconForWeatherId(
+                        WeatherContract.WeatherId.fromInt(cursor.getInt(COL_WEATHER_ID))));
             }
 
             if (cursor.moveToNext()) {
@@ -147,7 +149,8 @@ public class SunshineWidget extends AppWidgetProvider {
                         " / " + Sunshine.formatTemperature(context, cursor.getDouble(COL_LOW), isMetric);
                 views.setTextViewText(R.id.widget_day_text2, Sunshine.shortFriendlyDate(context, cursor.getString(COL_DATE)));
                 views.setTextViewText(R.id.widget_temperature_text2, temperature);
-                views.setImageViewResource(R.id.widget_icon2, Sunshine.getIconForWeatherId(cursor.getInt(COL_WEATHER_ID)));
+                views.setImageViewResource(R.id.widget_icon2, Sunshine.getIconForWeatherId(
+                        WeatherContract.WeatherId.fromInt(cursor.getInt(COL_WEATHER_ID))));
             }
         } finally {
             cursor.close();
@@ -155,8 +158,8 @@ public class SunshineWidget extends AppWidgetProvider {
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
-
     }
+
 
 
 

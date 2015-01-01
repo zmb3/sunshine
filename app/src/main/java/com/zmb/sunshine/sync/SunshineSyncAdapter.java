@@ -10,6 +10,7 @@ import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.zmb.sunshine.R;
@@ -17,6 +18,7 @@ import com.zmb.sunshine.Sunshine;
 import com.zmb.sunshine.data.IWeatherDataParser;
 import com.zmb.sunshine.data.db.WeatherContract;
 import com.zmb.sunshine.data.openweathermap.OpenWeatherMapParser;
+import com.zmb.sunshine.data.worldweatheronline.WorldWeatherOnlineParser;
 import com.zmb.sunshine.widget.SunshineWidget;
 import com.zmb.utils.IoUtils;
 
@@ -34,9 +36,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final int SYNC_INTERVAL_SECONDS = 60 * 60 * 3;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL_SECONDS / 3;
 
-    // TODO support other parsers
-    private final IWeatherDataParser mParser = new OpenWeatherMapParser();
-
     public SunshineSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
@@ -46,10 +45,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider, SyncResult syncResult) {
         String location = Sunshine.getPreferredLocation(getContext());
         HttpURLConnection connection = null;
+        IWeatherDataParser parser = getParser();
         try {
             removeOldWeatherData();
 
-            URL url = mParser.buildUrl(location, DAYS_TO_FETCH);
+            URL url = parser.buildUrl(location, DAYS_TO_FETCH);
             Log.v(TAG, "Querying " + url.toString());
 
             connection = (HttpURLConnection) url.openConnection();
@@ -58,7 +58,7 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
             InputStream inputStream = connection.getInputStream();
             String response = IoUtils.readAll(inputStream);
-            mParser.parse(getContext(), response, DAYS_TO_FETCH);
+            parser.parse(getContext(), response, DAYS_TO_FETCH);
 
             // update any widgets with the new data
             SunshineWidget.updateAllWidgets(getContext());
@@ -71,6 +71,19 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
     }
+
+    private IWeatherDataParser getParser() {
+        Context c = getContext();
+        String provider = PreferenceManager.getDefaultSharedPreferences(c)
+                .getString(c.getString(R.string.pref_weather_provider_key),
+                        c.getString(R.string.pref_weather_provider_default));
+        if (provider.equals(c.getString(R.string.pref_weather_provider_openweathermap))) {
+            return new OpenWeatherMapParser();
+        } else {
+            return new WorldWeatherOnlineParser();
+        }
+    }
+
 
     /**
      * A helper to get the fake account used with the SyncAdapter.

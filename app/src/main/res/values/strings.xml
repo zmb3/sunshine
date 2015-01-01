@@ -15,6 +15,11 @@
     <string name="pref_units_label">Units</string>
     <string name="pref_units_metric">Metric</string>
     <string name="pref_units_imperial">Imperial</string>
+    <string name="pref_weather_provider_label">Weather Provider</string>
+    <string name="pref_weather_provider_key">weather_provider</string>
+    <string name="pref_weather_provider_openweathermap" translatable="false">OpenWeatherMap</string>
+    <string name="pref_weather_provider_worldweatheronline" translatable="false">WorldWeatherOnline</string>
+    <string name="pref_weather_provider_default">@string/pref_weather_provider_openweathermap</string>
 
     <!-- all possible values for pref_units_key -->
     <array name="pref_units_value">
@@ -25,6 +30,16 @@
         <item>@string/pref_units_metric</item>
         <item>@string/pref_units_imperial</item>
     </array>
+
+    <array name="pref_weather_provider_values">
+        <item>@string/pref_weather_provider_openweathermap</item>
+        <item>@string/pref_weather_provider_worldweatheronline</item>
+    </array>
+    <array name="pref_weather_provider_options">
+        <item>@string/pref_weather_provider_openweathermap</item>
+        <item>@string/pref_weather_provider_worldweatheronline</item>
+    </array>
+
 
     <!-- date label for today -->
     <string name="today">Today</string>

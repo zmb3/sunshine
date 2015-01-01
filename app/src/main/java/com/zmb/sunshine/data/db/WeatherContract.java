@@ -14,6 +14,41 @@ import java.util.Date;
 public class WeatherContract {
 
     /**
+     * We use these integer codes in our database to represent different
+     * weather conditions.  These codes map to images that are displayed.
+     */
+    public static enum WeatherId {
+        STORM(0),
+        LIGHT_RAIN(1),
+        RAIN(2),
+        SNOW(3),
+        FOG(4),
+        CLEAR(5),
+        LIGHT_CLOUDS(6),
+        CLOUDS(7);
+
+        public final int mValue;
+
+        private WeatherId(int value) {
+            mValue = value;
+        }
+
+        public static WeatherId fromInt(int value) {
+            switch (value) {
+                case 0: return STORM;
+                case 1: return LIGHT_RAIN;
+                case 2: return RAIN;
+                case 3: return SNOW;
+                case 4: return FOG;
+                case 5: return CLEAR;
+                case 6: return LIGHT_CLOUDS;
+                case 7: return CLOUDS;
+                default: throw new IllegalArgumentException();
+            }
+        }
+    }
+
+    /**
      * A name for the content provider.
      */
     public static final String CONTENT_AUTHORITY = "com.zmb.sunshine";
@@ -102,7 +137,7 @@ public class WeatherContract {
         public static final String COLUMN_LOC_KEY = "location_id";
 
         /**
-         * The date, stored as text of the form yyyy-MM-dd.
+         * The date, stored as text of the form yyyyMMdd.
          */
         public static final String COLUMN_DATETEXT = "date";
 
@@ -115,14 +150,25 @@ public class WeatherContract {
          */
         public static final String COLUMN_SHORT_DESCRIPTION = "short_desc";
 
+        /**
+         * Temperature is stored in degrees Celsius.
+         */
         public static final String COLUMN_TEMPERATURE_HIGH = "max";
-
+        /**
+         * Temperature is stored in degrees Celsius.
+         */
         public static final String COLUMN_TEMPERATURE_LOW = "min";
 
         public static final String COLUMN_HUMIDITY = "humidity";
 
+        /**
+         * Pressure is measured in units of hPa.
+         */
         public static final String COLUMN_PRESSURE = "pressure";
 
+        /**
+         * Wind speed is measured in meters per second.
+         */
         public static final String COLUMN_WIND_SPEED = "wind";
 
         public static final String COLUMN_DEGREES = "degrees";

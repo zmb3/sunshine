@@ -28,6 +28,7 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
         // attach listeners to each preference
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_location_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_weather_provider_key)));
     }
 
 
@@ -57,8 +58,9 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         // if we're not just starting up and binding the preferences
         if (!mIsBindingPreference) {
-            // if the location setting has changed, we need to fetch new data
-            if (preference.getKey().equals(getString(R.string.pref_location_key))) {
+            // if the location setting or weather provider has changed, we need to fetch new data
+            if (preference.getKey().equals(getString(R.string.pref_location_key)) ||
+                    preference.getKey().equals(getString(R.string.pref_weather_provider_key))) {
                 SunshineSyncAdapter.syncNow(getActivity());
             } else {
 
